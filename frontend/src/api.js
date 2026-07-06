@@ -10,6 +10,13 @@ export async function fetchProjects() {
   return Array.isArray(data) ? data : data.projects;
 }
 
+export async function fetchProject(slug) {
+  const res = await fetch(`${BASE}/api/projects/${slug}`);
+  if (res.status === 404) throw new Error('not-found');
+  if (!res.ok) throw new Error(`Failed to load project (${res.status})`);
+  return res.json();
+}
+
 export async function sendContact(payload) {
   const res = await fetch(`${BASE}/api/contact`, {
     method: 'POST',

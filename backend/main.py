@@ -10,7 +10,7 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 
@@ -56,6 +56,15 @@ def get_projects():
         "projects": PROJECTS,
         "grouped": grouped,
     }
+
+
+@app.get("/api/projects/{slug}")
+def get_project(slug: str):
+    """Return a single project (full case-study detail) by slug."""
+    for p in PROJECTS:
+        if p["slug"] == slug:
+            return p
+    raise HTTPException(status_code=404, detail="Project not found")
 
 
 @app.post("/api/contact")
