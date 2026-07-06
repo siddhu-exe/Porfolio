@@ -28,9 +28,10 @@ export default function Home() {
   });
 
   const heroSink = {
-    y: useTransform(scrollYProgress, [0, 1], ['0vh', '45vh']),
-    opacity: useTransform(scrollYProgress, [0, 0.9], [1, 0]),
-    scale: useTransform(scrollYProgress, [0, 1], [1, 0.93]),
+    // reduce delay so the hero transition begins a bit sooner on scroll
+    y: useTransform(scrollYProgress, [0.12, 1], ['0vh', '45vh']),
+    opacity: useTransform(scrollYProgress, [0.12, 0.9], [1, 0]),
+    scale: useTransform(scrollYProgress, [0.12, 1], [1, 0.93]),
   };
 
   return (
@@ -42,7 +43,7 @@ export default function Home() {
         {/* The sticky hero is scoped to this wrapper: it stays pinned only
             while the Statement covers it, then releases. */}
         <div className="relative">
-          <div className="dot-grid sticky top-0 z-10 h-screen bg-cream">
+          <div className="dot-grid sticky top-0 z-10 h-screen md:h-[170vh] bg-cream">
             <Hero sinkStyle={heroSink} />
           </div>
           <div ref={statementRef} className="relative z-30">
