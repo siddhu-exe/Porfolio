@@ -4,6 +4,7 @@ import Hero from '../components/Hero.jsx';
 import Statement from '../components/Statement.jsx';
 import ProjectShelf from '../components/ProjectShelf.jsx';
 import Toolbox from '../components/Toolbox.jsx';
+import ReadingCorner from '../components/ReadingCorner.jsx';
 import Footer from '../components/Footer.jsx';
 import ContactModal from '../components/ContactModal.jsx';
 import { fetchProjects } from '../api.js';
@@ -62,13 +63,18 @@ export default function Home() {
           <Toolbox />
         </div>
 
+        {/* Reading Corner (black) — articles as little books. */}
+        <div className="relative z-30">
+          <ReadingCorner />
+        </div>
+
         {/* Stage transition #2, mirrored: the page's bottom edge is the podium
-            in reverse — the brown Toolbox lifts away step by step, revealing
-            the yellow footer beneath. */}
+            in reverse — the black Reading Corner lifts away step by step,
+            revealing the yellow footer beneath. */}
         <div aria-hidden className="relative z-30 flex flex-col items-center">
-          <div className="h-5 w-[80%] bg-bark md:h-8" />
-          <div className="h-5 w-[58%] bg-bark md:h-8" />
-          <div className="h-5 w-[36%] bg-bark md:h-8" />
+          <div className="h-5 w-[80%] bg-black md:h-8" />
+          <div className="h-5 w-[58%] bg-black md:h-8" />
+          <div className="h-5 w-[36%] bg-black md:h-8" />
         </div>
       </main>
 
