@@ -28,7 +28,7 @@ function initials(name) {
 function ToolIcon({ name, slug }) {
   const [failed, setFailed] = useState(false);
   if (!slug || failed) {
-    return <span className="text-base font-extrabold tracking-tight text-bark">{initials(name)}</span>;
+    return <span className="text-sm font-extrabold tracking-tight text-cream/80">{initials(name)}</span>;
   }
   return (
     <img
@@ -42,40 +42,41 @@ function ToolIcon({ name, slug }) {
   );
 }
 
-/** A tool that hangs from a nail and swings when the cursor sweeps over it. */
+/** A tool hanging from a brass nail; sweeps of the cursor set it swinging. */
 function HangingTool({ name, slug, stringLen }) {
   const controls = useAnimationControls();
 
   const swing = () =>
     controls.start({
-      rotate: [0, -13, 9, -6, 4, -2, 0],
-      transition: { duration: 1.15, ease: 'easeOut' },
+      rotate: [0, -10, 7, -4, 2, 0],
+      transition: { duration: 1.1, ease: 'easeOut' },
     });
 
   return (
     <div className="flex flex-col items-center">
-      {/* nail head */}
-      <div className="relative z-10 h-2.5 w-2.5 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-500 shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
-        <span className="absolute inset-[2px] rounded-full bg-zinc-400/60" />
-      </div>
+      {/* brass nail head */}
+      <div className="relative z-10 h-[7px] w-[7px] rounded-full bg-gradient-to-br from-[#E8CFA0] to-[#8A6A3B] shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
 
       <motion.div
-        className="-mt-1 flex flex-col items-center"
+        className="flex flex-col items-center"
         style={{ transformOrigin: 'top center' }}
         animate={controls}
         onMouseEnter={swing}
       >
-        {/* string */}
-        <div className="w-px bg-tan/70" style={{ height: stringLen }} />
+        {/* cord */}
+        <div
+          className="w-px bg-gradient-to-b from-white/30 to-white/10"
+          style={{ height: stringLen }}
+        />
 
-        {/* the hanging tag / key holding the icon */}
-        <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-white shadow-[0_6px_14px_rgba(0,0,0,0.45)] md:h-16 md:w-16">
-          {/* punched hole the string threads through */}
-          <span className="absolute left-1/2 top-1.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-bark/60 shadow-inner" />
+        {/* matte tile holding the icon */}
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#241609] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_12px_22px_rgba(0,0,0,0.55)] md:h-[4.4rem] md:w-[4.4rem]">
           <ToolIcon name={name} slug={slug} />
         </div>
 
-        <span className="mt-2 text-[11px] font-semibold tracking-wide text-tan md:text-xs">{name}</span>
+        <span className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/45">
+          {name}
+        </span>
       </motion.div>
     </div>
   );
@@ -86,13 +87,25 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 
+/** Small brass screw pinning the panel's corners. */
+function Screw({ className }) {
+  return (
+    <span
+      aria-hidden
+      className={`absolute h-2 w-2 rounded-full bg-gradient-to-br from-[#D9BE8C] to-[#77572F] shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${className}`}
+    >
+      <span className="absolute left-1/2 top-1/2 h-px w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-black/50" />
+    </span>
+  );
+}
+
 export default function Toolbox() {
-  // Stagger string lengths per column so the rack looks hand-hung, not gridded.
-  const stringLens = [16, 26, 20, 30, 22];
+  // Stagger cord lengths per column so the rack looks hand-hung, not gridded.
+  const stringLens = [14, 24, 18, 28, 20];
 
   return (
     <section id="toolbox" className="relative overflow-hidden bg-bark text-cream">
-      {/* transition in: a torn cream edge tears the cream shelf into the brown */}
+      {/* transition in: the cream shelf tears down into the espresso */}
       <svg
         viewBox="0 0 1440 70"
         preserveAspectRatio="none"
@@ -109,16 +122,15 @@ export default function Toolbox() {
         />
       </svg>
 
-      {/* dark-wood grain + vignette */}
+      {/* soft vignette, no stripes */}
       <div
         aria-hidden
-        className="absolute inset-0 opacity-60 [background:repeating-linear-gradient(90deg,rgba(0,0,0,0.25)_0px,rgba(0,0,0,0.25)_2px,transparent_2px,transparent_9px)]"
+        className="absolute inset-0 [background:radial-gradient(110%_90%_at_50%_10%,rgba(199,160,121,0.08),transparent_55%),radial-gradient(120%_80%_at_50%_100%,rgba(0,0,0,0.6),transparent)]"
       />
-      <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_80%_at_50%_0%,transparent,rgba(0,0,0,0.55))]" />
 
-      <div className="relative px-4 pb-12 pt-4 md:px-10 md:pb-16 md:pt-6">
+      <div className="relative px-4 pb-14 pt-4 md:px-10 md:pb-20 md:pt-6">
         <motion.header
-          className="mx-auto mb-8 max-w-3xl text-center md:mb-10"
+          className="mx-auto mb-8 max-w-3xl text-center md:mb-12"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
@@ -127,28 +139,32 @@ export default function Toolbox() {
           <h2 className="text-3xl font-bold tracking-tight text-cream md:text-5xl">
             Tools Behind Every Chapter
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm text-cream/60 md:text-base">
+          <p className="mx-auto mt-3 max-w-lg text-sm text-cream/55 md:text-base">
             The technologies that bring these ideas to life.
           </p>
         </motion.header>
 
-        {/* the toolbox / pegboard panel, in the lighter brown — wide + shallow */}
+        {/* walnut rack panel */}
         <motion.div
-          className="relative mx-auto max-w-6xl rounded-3xl border-4 border-[#3A2517] bg-gradient-to-b from-wood to-[#563922] px-4 py-6 shadow-2xl md:px-10 md:py-8"
+          className="relative mx-auto max-w-5xl rounded-2xl bg-gradient-to-b from-barklight to-[#1F1207] px-5 py-7 ring-1 ring-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] md:px-12 md:py-9"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-40px' }}
         >
-          {/* plank seams */}
+          {/* faint wood grain */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-3xl opacity-40 [background:repeating-linear-gradient(0deg,transparent_0,transparent_46px,rgba(0,0,0,0.25)_46px,rgba(0,0,0,0.25)_48px)]"
+            className="pointer-events-none absolute inset-0 rounded-2xl opacity-30 [background:repeating-linear-gradient(93deg,transparent_0,transparent_18px,rgba(0,0,0,0.28)_18px,rgba(0,0,0,0.28)_19px)]"
           />
-          {/* inner frame */}
-          <span className="pointer-events-none absolute inset-3 rounded-2xl border border-black/20" />
+          {/* inner bevel */}
+          <span className="pointer-events-none absolute inset-2 rounded-xl border border-white/5" />
+          <Screw className="left-3 top-3" />
+          <Screw className="right-3 top-3" />
+          <Screw className="bottom-3 left-3" />
+          <Screw className="bottom-3 right-3" />
 
-          <div className="relative grid grid-cols-3 gap-x-3 gap-y-6 sm:grid-cols-5 md:gap-x-6 md:gap-y-7">
+          <div className="relative grid grid-cols-3 gap-x-3 gap-y-7 sm:grid-cols-5 md:gap-x-6 md:gap-y-8">
             {TOOLS.map((t, i) => (
               <HangingTool
                 key={t.name}

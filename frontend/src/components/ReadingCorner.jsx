@@ -3,35 +3,32 @@ import { motion } from 'framer-motion';
 // Swap `url` for the real Medium links when published.
 const ARTICLES = [
   {
-    emoji: '📕',
     title: 'Bagging',
     tag: 'Ensemble Learning',
     blurb: 'How bootstrap aggregation tames variance.',
-    color: '#B23A32',
+    color: '#8F3A31',
     url: 'https://medium.com/',
   },
   {
-    emoji: '📗',
     title: 'Random Forest',
     tag: 'From Trees to Forests',
     blurb: 'Why many weak trees beat one deep one.',
-    color: '#2E7D57',
+    color: '#2E6149',
     url: 'https://medium.com/',
   },
   {
-    emoji: '📘',
     title: 'Logistic Regression',
     tag: 'The Classic Classifier',
     blurb: 'The workhorse behind probability outputs.',
-    color: '#2F5FA8',
+    color: '#2F5170',
     url: 'https://medium.com/',
   },
 ];
 
 const EASE = [0.22, 1, 0.36, 1];
 
-const rest = { rotateY: -32, y: 0 };
-const hover = { rotateY: 0, y: -18 };
+const rest = { rotateY: -30, y: 0 };
+const hover = { rotateY: 0, y: -16 };
 
 function ArticleBook({ article, index }) {
   return (
@@ -47,11 +44,11 @@ function ArticleBook({ article, index }) {
       viewport={{ once: true }}
       aria-label={`Read "${article.title}" on Medium`}
     >
-      {/* floor shadow that spreads as the book lifts */}
+      {/* contact shadow on the ledge, spreading as the book lifts */}
       <motion.div
         aria-hidden
-        className="absolute inset-x-6 bottom-[-14px] h-4 rounded-[50%] bg-black blur-md"
-        variants={{ rest: { opacity: 0.5, scaleX: 0.9 }, hover: { opacity: 0.75, scaleX: 1.1 } }}
+        className="absolute inset-x-5 bottom-[-12px] h-3 rounded-[50%] bg-black blur-md"
+        variants={{ rest: { opacity: 0.55, scaleX: 0.92 }, hover: { opacity: 0.8, scaleX: 1.12 } }}
         transition={{ duration: 0.5, ease: EASE }}
       />
 
@@ -74,45 +71,50 @@ function ArticleBook({ article, index }) {
           className="absolute left-0 top-0 flex h-full w-6 items-center justify-center rounded-l-sm"
           style={{ backgroundColor: article.color, transform: 'rotateY(-90deg)', transformOrigin: 'left center' }}
         >
-          <span className="absolute inset-0 bg-black/25" />
-          <span className="book-title relative max-h-[80%] overflow-hidden whitespace-nowrap text-[10px] font-semibold tracking-wide text-white/90">
+          <span className="absolute inset-0 bg-black/30" />
+          <span className="absolute inset-x-1 top-2 h-px bg-white/25" />
+          <span className="absolute inset-x-1 bottom-2 h-px bg-white/25" />
+          <span className="book-title relative max-h-[78%] overflow-hidden whitespace-nowrap text-[10px] font-semibold tracking-[0.12em] text-white/90">
             {article.title}
           </span>
         </div>
 
-        {/* front cover */}
+        {/* front cover — editorial jacket */}
         <div
-          className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-l-sm rounded-r-md p-4 shadow-[0_18px_40px_rgba(0,0,0,0.6)]"
+          className="absolute inset-0 flex flex-col overflow-hidden rounded-l-sm rounded-r-md p-4 shadow-[0_18px_40px_rgba(0,0,0,0.65)]"
           style={{ backgroundColor: article.color, backfaceVisibility: 'hidden' }}
         >
-          {/* dark spine gutter + emboss frame */}
-          <span className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/40 to-transparent" />
-          <span className="pointer-events-none absolute inset-2.5 rounded-md border border-white/20" />
+          {/* cloth texture + tonal depth */}
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/25" />
+          <span className="pointer-events-none absolute inset-0 opacity-20 [background:repeating-linear-gradient(45deg,transparent_0,transparent_3px,rgba(255,255,255,0.05)_3px,rgba(255,255,255,0.05)_4px)]" />
+          {/* spine gutter + foil frame */}
+          <span className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/45 to-transparent" />
+          <span className="pointer-events-none absolute inset-2.5 rounded-[4px] border border-white/25" />
 
-          <div className="relative flex items-start justify-between">
-            <span className="text-3xl drop-shadow">{article.emoji}</span>
-            <span className="mt-1 rounded-full bg-black/20 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white/80">
-              Article
-            </span>
-          </div>
-
-          <div className="relative">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
-              {article.tag}
+          <div className="relative flex h-full flex-col p-1.5">
+            {/* masthead */}
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/60">
+              Article {String(index + 1).padStart(2, '0')}
             </p>
-            <h3 className="mt-1 text-lg font-bold leading-tight tracking-tight text-white">
-              {article.title}
-            </h3>
-            <p className="mt-1 text-[11px] leading-snug text-white/70">{article.blurb}</p>
+            <span className="mt-2 h-px w-8 bg-white/40" />
 
-            <div className="mt-3 flex items-center justify-between">
-              {/* faux barcode for book-jacket flavor */}
-              <span className="flex items-end gap-[2px]" aria-hidden>
-                {[3, 6, 2, 5, 3, 7, 2, 4, 6, 3].map((h, k) => (
-                  <span key={k} className="w-[2px] bg-white/70" style={{ height: h + 6 }} />
-                ))}
+            {/* title block */}
+            <div className="mt-auto">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/55">
+                {article.tag}
+              </p>
+              <h3 className="mt-1.5 text-[1.35rem] font-bold leading-[1.08] tracking-tight text-white">
+                {article.title}
+              </h3>
+              <p className="mt-2 text-[10.5px] leading-snug text-white/65">{article.blurb}</p>
+            </div>
+
+            {/* colophon */}
+            <div className="mt-4 flex items-end justify-between border-t border-white/20 pt-2">
+              <span className="text-[8.5px] font-semibold uppercase tracking-[0.2em] text-white/60">
+                S. Dongardive
               </span>
-              <span className="text-[10px] font-semibold text-white/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-white/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 Read&nbsp;&#8599;
               </span>
             </div>
@@ -131,7 +133,7 @@ const fadeUp = {
 export default function ReadingCorner() {
   return (
     <section id="reading" className="relative overflow-hidden bg-black text-cream">
-      {/* transition in: brown Toolbox tears down into the black */}
+      {/* transition in: the espresso Toolbox tears down into the black */}
       <svg
         viewBox="0 0 1440 70"
         preserveAspectRatio="none"
@@ -156,7 +158,7 @@ export default function ReadingCorner() {
 
       <div className="relative px-6 pb-24 pt-8 md:px-16 md:pb-32 md:pt-12">
         <motion.header
-          className="mx-auto mb-16 max-w-2xl text-center md:mb-24"
+          className="mx-auto mb-14 max-w-2xl text-center md:mb-20"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
@@ -172,15 +174,23 @@ export default function ReadingCorner() {
         </motion.header>
 
         <motion.div
-          className="mx-auto flex max-w-4xl flex-wrap items-end justify-center gap-x-14 gap-y-16 md:gap-x-24"
+          className="mx-auto max-w-4xl"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
         >
-          {ARTICLES.map((a, i) => (
-            <ArticleBook key={a.title} article={a} index={i} />
-          ))}
+          <div className="flex flex-wrap items-end justify-center gap-x-14 gap-y-16 md:gap-x-24">
+            {ARTICLES.map((a, i) => (
+              <ArticleBook key={a.title} article={a} index={i} />
+            ))}
+          </div>
+
+          {/* wooden ledge the books stand on */}
+          <div className="relative mt-3">
+            <div className="h-2.5 rounded-[3px] border-t border-white/20 bg-gradient-to-b from-[#8B6F55] to-[#5E4936]" />
+            <div className="absolute inset-x-10 top-full h-5 bg-black/80 blur-lg" />
+          </div>
         </motion.div>
       </div>
     </section>

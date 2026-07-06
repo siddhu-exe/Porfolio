@@ -8,9 +8,9 @@ export default {
         ink: '#171717',
         terracotta: '#D9834A',
         mustard: '#FFE862',
-        // Toolbox browns (from the reference: dark espresso bg + light-wood panel)
-        bark: '#2A1A10',
-        barklight: '#3A2517',
+        // Toolbox browns — deep matte espresso + walnut panel
+        bark: '#1B1109',
+        barklight: '#2B1A0E',
         wood: '#6D4A30',
         tan: '#C7A079',
       },

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePageTransition } from './PageTransition.jsx';
 
 const EASE = [0.22, 1, 0.36, 1];
 // Cover flip + spread re-centering share this so the book stays physical.
@@ -24,7 +24,7 @@ const line = {
  * opens, exactly like laying a book flat. Close reverses every step.
  */
 export default function BookModal({ project, onClose }) {
-  const navigate = useNavigate();
+  const transitionTo = usePageTransition();
 
   useEffect(() => {
     if (!project) return;
@@ -107,7 +107,13 @@ export default function BookModal({ project, onClose }) {
 
                   <motion.div variants={line}>
                     <button
-                      onClick={() => navigate(`/projects/${project.slug}`)}
+                      onClick={() =>
+                        transitionTo(`/projects/${project.slug}`, {
+                          color: project.color,
+                          title: project.title,
+                          category: project.category,
+                        })
+                      }
                       className="mt-4 self-start rounded-full bg-ink px-5 py-2.5 text-xs font-semibold text-cream transition-transform hover:scale-105 md:mt-6 md:px-6 md:py-3 md:text-sm"
                     >
                       View Full Project &rarr;
