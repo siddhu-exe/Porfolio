@@ -4,7 +4,15 @@ import BookSpine from './BookSpine.jsx';
 import BookModal from './BookModal.jsx';
 import CursorBadge from './CursorBadge.jsx';
 
-const CATEGORY_ORDER = ['SQL', 'Machine Learning', 'Deep Learning', 'NLP', 'AI Agents'];
+// Shelf order + captions. Books are filtered in from the fetched project list
+// by matching `category`, so shelves stay data-driven (add books freely).
+const SHELVES = [
+  { key: 'Data Analytics', subtitle: 'Extracting insights from data to drive better decisions.' },
+  { key: 'Data Visualization', subtitle: 'Transforming complex data into clear and interactive stories.' },
+  { key: 'Machine Learning', subtitle: 'Building predictive models that learn from data.' },
+  { key: 'Deep Learning', subtitle: 'Solving complex problems using neural networks and computer vision.' },
+  { key: 'AI Applications', subtitle: 'Creating intelligent systems powered by modern AI.' },
+];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 50 },
@@ -20,9 +28,10 @@ export default function ProjectShelf({ projects }) {
   const [active, setActive] = useState(null);
   const [hovering, setHovering] = useState(false);
 
-  const shelves = CATEGORY_ORDER.map((category) => ({
-    category,
-    books: projects.filter((p) => p.category === category),
+  const shelves = SHELVES.map(({ key, subtitle }) => ({
+    category: key,
+    subtitle,
+    books: projects.filter((p) => p.category === key),
   }));
 
   return (
@@ -78,13 +87,13 @@ export default function ProjectShelf({ projects }) {
         </motion.header>
 
         <div className="mx-auto max-w-3xl">
-          {shelves.map(({ category, books }, si) => {
+          {shelves.map(({ category, subtitle, books }, si) => {
             const mid = Math.ceil(books.length / 2);
             const left = books.slice(0, mid);
             const right = books.slice(mid);
             return (
               <div key={category} className="mb-14 md:mb-20">
-                <div className="flex items-end justify-center gap-4 px-2 md:gap-10">
+                <div className="flex items-end justify-center gap-3 px-2 md:gap-8">
                   <div className="flex flex-1 items-end justify-end gap-2 md:gap-3">
                     {left.map((p, i) => (
                       <BookSpine
@@ -98,12 +107,16 @@ export default function ProjectShelf({ projects }) {
                     ))}
                   </div>
 
-                  <div className="pb-4 text-center">
-                    <span className="block text-[10px] font-semibold tracking-[0.35em] text-terracotta">
-                      {String(si + 1).padStart(2, '0')}
+                  {/* shelf label sits up top, centered between the two books */}
+                  <div className="w-40 shrink-0 self-start pt-1 text-center md:w-72">
+                    <span className="block text-[10px] font-semibold uppercase tracking-[0.3em] text-terracotta">
+                      Shelf {si + 1}
                     </span>
-                    <span className="mt-1 block min-w-[6.5rem] text-base font-semibold uppercase tracking-[0.18em] text-ink/85 md:min-w-[13rem] md:text-2xl">
+                    <span className="mt-1 block text-base font-bold uppercase leading-tight tracking-[0.1em] text-ink/85 md:text-2xl">
                       {category}
+                    </span>
+                    <span className="mx-auto mt-2 block max-w-[11rem] text-[10px] font-normal leading-snug text-ink/55 md:max-w-[15rem] md:text-xs">
+                      {subtitle}
                     </span>
                   </div>
 

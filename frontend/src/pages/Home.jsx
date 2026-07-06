@@ -3,6 +3,7 @@ import { useScroll, useTransform } from 'framer-motion';
 import Hero from '../components/Hero.jsx';
 import Statement from '../components/Statement.jsx';
 import ProjectShelf from '../components/ProjectShelf.jsx';
+import Toolbox from '../components/Toolbox.jsx';
 import Footer from '../components/Footer.jsx';
 import ContactModal from '../components/ContactModal.jsx';
 import { fetchProjects } from '../api.js';
@@ -56,12 +57,18 @@ export default function Home() {
           <ProjectShelf projects={projects} />
         </div>
 
+        {/* Toolbox section (dark brown) sits below the shelf. */}
+        <div className="relative z-30">
+          <Toolbox />
+        </div>
+
         {/* Stage transition #2, mirrored: the page's bottom edge is the podium
-            in reverse — it lifts away step by step, revealing the footer. */}
+            in reverse — the brown Toolbox lifts away step by step, revealing
+            the yellow footer beneath. */}
         <div aria-hidden className="relative z-30 flex flex-col items-center">
-          <div className="h-5 w-[80%] bg-cream md:h-8" />
-          <div className="h-5 w-[58%] bg-cream md:h-8" />
-          <div className="h-5 w-[36%] bg-cream md:h-8" />
+          <div className="h-5 w-[80%] bg-bark md:h-8" />
+          <div className="h-5 w-[58%] bg-bark md:h-8" />
+          <div className="h-5 w-[36%] bg-bark md:h-8" />
         </div>
       </main>
 

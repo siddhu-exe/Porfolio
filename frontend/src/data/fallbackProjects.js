@@ -2,28 +2,61 @@
 const PALETTE = ['#D9834A', '#E4A356', '#7FA98F', '#6C8EBF', '#B5729B', '#C9695A', '#5C9EAD', '#D4A24E'];
 
 const CATS = [
-  { category: 'SQL', titles: ['Retail Insights', 'Query Optimizer'] },
-  { category: 'Machine Learning', titles: ['Churn Predictor', 'Price Forecaster'] },
-  { category: 'Deep Learning', titles: ['Vision Net', 'Audio Tagger'] },
-  { category: 'NLP', titles: ['Sentiment Engine', 'Doc Summarizer'] },
-  { category: 'AI Agents', titles: ['Task Orchestrator', 'Research Copilot'] },
+  {
+    category: 'Data Analytics',
+    projects: [
+      { title: 'Customer Churn Analysis', tech: ['Pandas', 'SQL', 'Matplotlib'] },
+      { title: 'Retail Sales Analysis', tech: ['Pandas', 'NumPy', 'Seaborn'] },
+    ],
+  },
+  {
+    category: 'Data Visualization',
+    projects: [
+      { title: 'Sales Dashboard (Tableau)', tech: ['Tableau', 'SQL', 'Excel'] },
+      { title: 'IPL Data Visualization', tech: ['Python', 'Plotly', 'Pandas'] },
+    ],
+  },
+  {
+    category: 'Machine Learning',
+    projects: [
+      { title: 'Loan Approval Predictor', tech: ['scikit-learn', 'XGBoost', 'Pandas'] },
+      { title: 'FIFA World Cup Predictor', tech: ['scikit-learn', 'Pandas', 'NumPy'] },
+    ],
+  },
+  {
+    category: 'Deep Learning',
+    projects: [
+      { title: "Alzheimer's MRI Detection", tech: ['TensorFlow', 'CNN', 'OpenCV'] },
+      { title: 'Plant Disease Detection', tech: ['PyTorch', 'CNN', 'OpenCV'] },
+    ],
+  },
+  {
+    category: 'AI Applications',
+    projects: [
+      { title: 'RAG Chatbot', tech: ['LangChain', 'FastAPI', 'OpenAI'] },
+      { title: 'AI Research Assistant', tech: ['LangGraph', 'RAG', 'Chroma'] },
+    ],
+  },
 ];
 
 let counter = 0;
-export const fallbackProjects = CATS.flatMap(({ category, titles }) =>
-  titles.map((title) => {
+export const fallbackProjects = CATS.flatMap(({ category, projects }) =>
+  projects.map(({ title, tech }) => {
     const id = ++counter;
     return {
       id,
       title,
-      slug: title.toLowerCase().replace(/\s+/g, '-'),
+      slug: title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, ''),
       category,
       color: PALETTE[(id - 1) % PALETTE.length],
       thumbnail: null,
       description: `${title} is a placeholder ${category} project. A real description and imagery will be added in a later pass.`,
       images: [],
       project_url: '#',
-      tech_stack: ['Python', 'FastAPI'],
+      tech_stack: tech,
     };
   })
 );

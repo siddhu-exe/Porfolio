@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 
-from data import PROJECTS, _CATEGORIES
+from data import PROJECTS, SHELVES, _CATEGORIES
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("portfolio")
@@ -35,7 +35,7 @@ app.add_middleware(
 )
 
 CONTACT_LOG = Path(__file__).parent / "contact_messages.jsonl"
-CATEGORY_ORDER = [name for name, _ in _CATEGORIES]
+CATEGORY_ORDER = [name for name, _sub, _items in _CATEGORIES]
 
 
 class ContactMessage(BaseModel):
@@ -52,6 +52,7 @@ def get_projects():
         grouped.setdefault(p["category"], []).append(p)
     return {
         "categories": CATEGORY_ORDER,
+        "shelves": SHELVES,
         "projects": PROJECTS,
         "grouped": grouped,
     }
