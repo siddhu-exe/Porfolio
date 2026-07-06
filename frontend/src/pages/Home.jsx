@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useScroll, useTransform } from 'framer-motion';
 import Hero from '../components/Hero.jsx';
+import Statement from '../components/Statement.jsx';
 import ProjectShelf from '../components/ProjectShelf.jsx';
 import Footer from '../components/Footer.jsx';
 import ContactModal from '../components/ContactModal.jsx';
@@ -10,7 +11,7 @@ import { fallbackProjects } from '../data/fallbackProjects.js';
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [contactOpen, setContactOpen] = useState(false);
-  const shelfRef = useRef(null);
+  const statementRef = useRef(null);
 
   useEffect(() => {
     fetchProjects()
@@ -18,12 +19,11 @@ export default function Home() {
       .catch(() => setProjects(fallbackProjects));
   }, []);
 
-  // Scroll-linked stage transition: the hero is sticky (pinned), and the shelf
-  // — in normal flow right after it — scrolls up OVER it. While the shelf's
-  // stepped edge rises (progress 0 -> 1), the hero sinks down and fades like a
-  // trapdoor lowering.
+  // Stage transition #1: the hero is pinned (sticky) while the black
+  // Statement section's stepped podium edge rises over it; the hero sinks and
+  // fades in lockstep with the scroll.
   const { scrollYProgress } = useScroll({
-    target: shelfRef,
+    target: statementRef,
     offset: ['start end', 'start start'],
   });
 
@@ -35,18 +35,36 @@ export default function Home() {
 
   return (
     <>
-      {/* Opaque page content, above the fixed footer */}
-      <main id="top" className="dot-grid relative z-10 bg-cream">
-        <div className="sticky top-0 z-10 h-screen">
-          <Hero sinkStyle={heroSink} />
+      {/* Opaque page content, above the fixed footer. No background of its
+          own — each section paints itself, so the stepped bottom edge can
+          show the footer through its gaps. */}
+      <main id="top" className="relative z-10">
+        {/* The sticky hero is scoped to this wrapper: it stays pinned only
+            while the Statement covers it, then releases. */}
+        <div className="relative">
+          <div className="dot-grid sticky top-0 z-10 h-screen bg-cream">
+            <Hero sinkStyle={heroSink} />
+          </div>
+          <div ref={statementRef} className="relative z-30">
+            <Statement />
+          </div>
         </div>
-        <div ref={shelfRef} className="relative z-30">
+
+        {/* Color shift (brush edge) into the cream shelf — no motion here. */}
+        <div className="relative z-30">
           <ProjectShelf projects={projects} />
+        </div>
+
+        {/* Stage transition #2, mirrored: the page's bottom edge is the podium
+            in reverse — it lifts away step by step, revealing the footer. */}
+        <div aria-hidden className="relative z-30 flex flex-col items-center">
+          <div className="h-5 w-[80%] bg-cream md:h-8" />
+          <div className="h-5 w-[58%] bg-cream md:h-8" />
+          <div className="h-5 w-[36%] bg-cream md:h-8" />
         </div>
       </main>
 
-      {/* Reveal window: as the page scrolls past, the fixed footer beneath is
-          uncovered with the same stage-like motion (content lifts away). */}
+      {/* Reveal window for the fixed footer underneath */}
       <div id="contact" className="relative h-screen" />
       <Footer onReachOut={() => setContactOpen(true)} />
 

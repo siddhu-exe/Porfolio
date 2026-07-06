@@ -16,7 +16,7 @@ export default function BookSpine({ project, onOpen, onHover, lean = 0, delay = 
         height: `clamp(130px, 22vw, ${h}px)`,
         width: `clamp(34px, 7vw, ${w}px)`,
         transformOrigin: 'bottom center',
-        boxShadow: '7px 4px 18px rgba(0,0,0,0.5)',
+        boxShadow: '7px 4px 16px rgba(0,0,0,0.28)',
       }}
       initial={{ y: 80, opacity: 0, rotate: 0 }}
       whileInView={{ y: 0, opacity: 1, rotate: lean }}
