@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Signature from './Signature.jsx';
-import Typewriter from './Typewriter.jsx';
 import MenuPill from './MenuPill.jsx';
 import CursorBadge from './CursorBadge.jsx';
+import CyclingTypewriter from './CyclingTypewriter.jsx';
+
+const CURSOR_PHRASES = ['hey there?', 'Curious?', 'Explore My Library ↓'];
 
 const EASE = [0.76, 0, 0.24, 1];
 
@@ -35,20 +37,20 @@ export default function Hero({ sinkStyle }) {
     return () => clearTimeout(t);
   }, []);
 
-  const badgeActive = phase === 'hero' && cursorOn;
-
   return (
     <section
       className="relative h-screen overflow-hidden"
       onMouseEnter={() => setCursorOn(true)}
       onMouseLeave={() => setCursorOn(false)}
     >
+      {/* Cursor badge runs from the moment the signature starts drawing,
+          cycling through its phrases as the mouse moves over the hero. */}
       <CursorBadge
-        active={badgeActive}
+        active={cursorOn}
         centered={false}
         className="h-14 whitespace-nowrap bg-[#37ACE8] px-5 text-base text-white"
       >
-        {badgeActive && <Typewriter text="Hey there!" delay={120} speed={60} />}
+        <CyclingTypewriter phrases={CURSOR_PHRASES} />
       </CursorBadge>
 
       <motion.div className="absolute inset-0" style={sinkStyle}>
@@ -94,9 +96,11 @@ export default function Hero({ sinkStyle }) {
           >
             <motion.p
               variants={riseIn}
-              className="mb-4 text-left text-sm font-medium uppercase tracking-widest text-ink/70 md:mb-6 md:text-base"
+              className="mb-4 text-left text-sm font-medium uppercase leading-snug tracking-widest text-ink/70 md:mb-6 md:text-base"
             >
-              Turning Data into Intelligence
+              Turning Data
+              <br />
+              Into Intelligence
             </motion.p>
 
             <h1 className="text-center font-bold leading-[0.95] tracking-headline text-ink">
@@ -116,9 +120,11 @@ export default function Hero({ sinkStyle }) {
 
             <motion.p
               variants={riseIn}
-              className="mt-4 text-right text-sm font-medium uppercase tracking-widest text-ink/70 md:mt-6 md:text-base"
+              className="mt-4 text-right text-sm font-medium uppercase leading-snug tracking-widest text-ink/70 md:mt-6 md:text-base"
             >
-              Projects &bull; Research &bull; Engineering
+              Building AI, Machine Learning,
+              <br />
+              and Full-Stack Applications.
             </motion.p>
 
             <motion.div variants={riseIn} className="mt-10 md:mt-12">

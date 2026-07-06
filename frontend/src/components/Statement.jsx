@@ -1,12 +1,54 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+
+// The statement, word by word (bold flag for the lead-in).
+const WORDS = [
+  { t: 'Every', b: true },
+  { t: 'book', b: true },
+  { t: 'on' },
+  { t: 'this' },
+  { t: 'shelf' },
+  { t: 'represents' },
+  { t: 'a' },
+  { t: 'challenge' },
+  { t: 'solved' },
+  { t: 'and' },
+  { t: 'a' },
+  { t: 'lesson' },
+  { t: 'learned.' },
+];
+
+function Word({ text, bold, progress, start, end }) {
+  const opacity = useTransform(progress, [start, end], [0.15, 1]);
+  return (
+    <motion.span
+      style={{ opacity }}
+      className={`mr-[0.28em] inline-block ${bold ? 'font-bold' : 'font-light'}`}
+    >
+      {text}
+    </motion.span>
+  );
+}
 
 /**
  * Dark interlude between the hero and the shelf. Rises over the pinned hero
- * with the stepped podium edge, holds the big statement line (reference:
- * "4+ years of crafting…"), then hands off to the cream shelf section through
- * a rough hand-painted brush edge — a color shift, not a transition.
+ * with the stepped podium edge. As the user scrolls through, the statement
+ * lights up word by word (dim -> full opacity) and the line beneath draws
+ * itself in — both tied directly to scroll position. Hands off to the cream
+ * shelf through a rough hand-painted brush edge.
  */
 export default function Statement() {
+  const textRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: textRef,
+    offset: ['start 0.85', 'end 0.45'],
+  });
+
+  // Words fill the first ~75% of the reveal; the line draws over the last part.
+  const total = WORDS.length;
+  const span = 0.75;
+  const lineLength = useTransform(scrollYProgress, [0.72, 1], [0, 1]);
+
   return (
     <section className="relative">
       {/* stepped podium silhouette rising over the hero */}
@@ -23,23 +65,28 @@ export default function Statement() {
           className="absolute inset-0 [background-image:radial-gradient(rgba(247,241,237,0.08)_1px,transparent_1px)] [background-size:24px_24px]"
         />
 
-        <div className="relative flex min-h-screen flex-col items-center justify-center px-8 py-24 md:px-16">
-          <div className="flex w-full items-center gap-6 md:gap-12">
-            <span className="hidden h-px flex-1 bg-cream/25 md:block" />
-            <motion.h2
-              className="mx-auto max-w-4xl text-center text-[1.75rem] font-light leading-snug tracking-tight md:text-6xl md:leading-tight"
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-120px' }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span className="font-bold">Every book</span> on this shelf represents
-              a challenge solved and a lesson learned.
-            </motion.h2>
-            <span className="hidden h-px flex-1 bg-cream/25 md:block" />
-          </div>
+        <div
+          ref={textRef}
+          className="relative flex min-h-screen flex-col items-center justify-center px-8 py-24 md:px-16"
+        >
+          <h2 className="mx-auto max-w-4xl text-center text-[1.75rem] leading-snug tracking-tight md:text-6xl md:leading-tight">
+            {WORDS.map((w, i) => {
+              const start = (i / total) * span;
+              const end = start + span / total + 0.06;
+              return (
+                <Word
+                  key={i}
+                  text={w.t}
+                  bold={w.b}
+                  progress={scrollYProgress}
+                  start={start}
+                  end={Math.min(end, 1)}
+                />
+              );
+            })}
+          </h2>
 
-          {/* flowing hand-drawn line, drawn in on scroll */}
+          {/* flowing hand-drawn line, drawn in with scroll */}
           <svg
             viewBox="0 0 1200 200"
             fill="none"
@@ -50,10 +97,7 @@ export default function Statement() {
               stroke="currentColor"
               strokeWidth="3"
               strokeLinecap="round"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 1.8, ease: 'easeInOut' }}
+              style={{ pathLength: lineLength }}
             />
           </svg>
         </div>
