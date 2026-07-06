@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import Signature from './Signature.jsx';
 
 const SOCIALS = [
-  { label: 'GitHub', href: '#' },
-  { label: 'LinkedIn', href: '#' },
-  { label: 'X', href: '#' },
-  { label: 'Instagram', href: '#' },
+  { label: 'GitHub', href: 'https://github.com/siddhu-exe' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/siddharth-dongardive-906a79251' },
 ];
 
 /**
@@ -41,18 +39,17 @@ export default function Footer({ onReachOut }) {
       <div className="relative flex min-h-0 flex-1 flex-col px-8 pt-6 md:px-16">
         {/* top bar: socials + email */}
         <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-widest text-ink/70 md:text-xs">
-          <div className="flex gap-4 md:gap-6">
-            {SOCIALS.map((s) => (
-              <a key={s.label} href={s.href} className="transition-colors hover:text-ink">
-                {s.label}
-              </a>
-            ))}
+            <div className="flex gap-4 md:gap-6">
+              {SOCIALS.map((s) => (
+                <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="transition-colors hover:text-ink">
+                  {s.label}
+                </a>
+              ))}
+            </div>
+            <a href="mailto:dongardivedeepak17@gmail.com" className="transition-colors hover:text-ink">
+              dongardivedeepak17@gmail.com
+            </a>
           </div>
-          <a href="mailto:hello@siddharth.dev" className="transition-colors hover:text-ink">
-            hello@siddharth.dev
-          </a>
-        </div>
-
         {/* ghost name with the signature floating over it */}
         <div className="relative flex min-h-0 flex-1 items-center justify-center">
           <h2 className="select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]">
@@ -67,12 +64,16 @@ export default function Footer({ onReachOut }) {
       <div className="relative border-t border-ink/15 bg-cream px-8 py-7 md:px-16 md:py-9">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm text-ink/60">Let&apos;s build something</p>
-            <h3 className="mt-1 text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl">
-              MEANINGFUL
+            <h3 className="text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl">
+              LIBRARY
               <br />
-              AND MEMORABLE
+              CLOSED
             </h3>
+            <p className="mt-4 text-sm text-ink/70 md:text-base">
+              Until the next project.
+              <br />
+             
+            </p>
           </div>
 
           <div className="flex flex-col items-start gap-3 md:items-end">
