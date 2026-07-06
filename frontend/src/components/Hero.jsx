@@ -96,35 +96,34 @@ export default function Hero({ sinkStyle }) {
           >
             <motion.p
               variants={riseIn}
-              className="mb-4 text-left text-sm font-medium uppercase leading-snug tracking-widest text-ink/70 md:mb-6 md:text-base"
+              className="mb-4 text-left text-[0.9rem] font-light uppercase leading-snug tracking-[0.35em] text-ink/70 md:mb-6 md:text-base"
             >
-              Turning Data
-              <br />
-              Into Intelligence
+              SIDDHARTH 
+              DONGARDIVE
             </motion.p>
 
-            <h1 className="text-center font-bold leading-[0.95] tracking-headline text-ink">
+            
+
+            <h1 className="text-center font-bold leading-[0.95] tracking-tight text-ink">
               <motion.span
                 variants={riseIn}
-                className="block text-[13.5vw] md:text-[11vw]"
+                className="block text-[12vw] md:text-[8.5vw] lg:text-[7vw]"
               >
-                SIDDHARTH
+                TURNING DATA
               </motion.span>
               <motion.span
                 variants={riseIn}
-                className="block text-[13.5vw] md:text-[11vw]"
+                className="block text-[12vw] md:text-[8.5vw] lg:text-[7vw]"
               >
-                DONGARDIVE
+                INTO INTELLIGENCE
               </motion.span>
             </h1>
 
             <motion.p
               variants={riseIn}
-              className="mt-4 text-right text-sm font-medium uppercase leading-snug tracking-widest text-ink/70 md:mt-6 md:text-base"
+              className="mt-4 text-right text-[0.9rem] font-light uppercase leading-snug tracking-[0.35em] text-ink/70 md:mt-6 md:text-base"
             >
-              Building AI, Machine Learning,
-              <br />
-              and Full-Stack Applications.
+              AI Engineer • Data Scientist
             </motion.p>
 
             <motion.div variants={riseIn} className="mt-10 md:mt-12">

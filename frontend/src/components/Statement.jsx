@@ -31,23 +31,23 @@ function Word({ text, bold, progress, start, end }) {
 }
 
 /**
- * Dark interlude between the hero and the shelf. Rises over the pinned hero
- * with the stepped podium edge. As the user scrolls through, the statement
- * lights up word by word (dim -> full opacity) and the line beneath draws
- * itself in — both tied directly to scroll position. Hands off to the cream
- * shelf through a rough hand-painted brush edge.
+ * Dark interlude between the hero and the shelf. It rises over the pinned hero
+ * with the stepped podium edge, then PINS: the statement stays centered on
+ * screen while the user scrolls through a tall track, lighting up word by word
+ * (dim -> full) with the line beneath drawing itself in. Because the section
+ * holds until the reveal finishes, a fast scroller is forced through it and
+ * actually reads it. Hands off to the cream shelf through a brush edge.
  */
 export default function Statement() {
-  const textRef = useRef(null);
+  const trackRef = useRef(null);
   const { scrollYProgress } = useScroll({
-    target: textRef,
-    offset: ['start 0.85', 'end 0.45'],
+    target: trackRef,
+    offset: ['start start', 'end end'],
   });
 
-  // Words fill the first ~75% of the reveal; the line draws over the last part.
   const total = WORDS.length;
-  const span = 0.75;
-  const lineLength = useTransform(scrollYProgress, [0.72, 1], [0, 1]);
+  const wordSpan = 0.75; // words finish revealing later in the pin
+  const lineLength = useTransform(scrollYProgress, [0.75, 1], [0, 1]);
 
   return (
     <section className="relative">
@@ -59,47 +59,47 @@ export default function Statement() {
       </div>
 
       <div className="relative bg-ink text-cream">
-        {/* faint dot grid on dark */}
-        <div
-          aria-hidden
-          className="absolute inset-0 [background-image:radial-gradient(rgba(247,241,237,0.08)_1px,transparent_1px)] [background-size:24px_24px]"
-        />
-
-        <div
-          ref={textRef}
-          className="relative flex min-h-screen flex-col items-center justify-center px-8 py-24 md:px-16"
-        >
-          <h2 className="mx-auto max-w-4xl text-center text-[1.75rem] leading-snug tracking-tight md:text-6xl md:leading-tight">
-            {WORDS.map((w, i) => {
-              const start = (i / total) * span;
-              const end = start + span / total + 0.06;
-              return (
-                <Word
-                  key={i}
-                  text={w.t}
-                  bold={w.b}
-                  progress={scrollYProgress}
-                  start={start}
-                  end={Math.min(end, 1)}
-                />
-              );
-            })}
-          </h2>
-
-          {/* flowing hand-drawn line, drawn in with scroll */}
-          <svg
-            viewBox="0 0 1200 200"
-            fill="none"
-            className="mt-10 w-full max-w-4xl text-cream/50 md:mt-16"
-          >
-            <motion.path
-              d="M0 160 C 120 40, 260 185, 420 120 C 560 68, 620 30, 760 92 C 880 145, 980 180, 1100 108 C 1150 78, 1185 62, 1200 55"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              style={{ pathLength: lineLength }}
+        {/* tall track — its length is how long the statement stays pinned */}
+        <div ref={trackRef} className="relative h-[300vh]">
+          <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-8 md:px-16">
+            {/* faint dot grid on dark */}
+            <div
+              aria-hidden
+              className="absolute inset-0 [background-image:radial-gradient(rgba(247,241,237,0.08)_1px,transparent_1px)] [background-size:24px_24px]"
             />
-          </svg>
+
+            <h2 className="relative mx-auto max-w-4xl text-center text-[1.9rem] leading-snug tracking-tight md:text-6xl md:leading-tight">
+              {WORDS.map((w, i) => {
+                const start = (i / total) * wordSpan;
+                const end = start + wordSpan / total + 0.05;
+                return (
+                  <Word
+                    key={i}
+                    text={w.t}
+                    bold={w.b}
+                    progress={scrollYProgress}
+                    start={start}
+                    end={Math.min(end, 1)}
+                  />
+                );
+              })}
+            </h2>
+
+            {/* flowing hand-drawn line, drawn in with scroll */}
+            <svg
+              viewBox="0 0 1200 200"
+              fill="none"
+              className="relative mt-10 w-full max-w-4xl text-cream/50 md:mt-16"
+            >
+              <motion.path
+                d="M0 160 C 120 40, 260 185, 420 120 C 560 68, 620 30, 760 92 C 880 145, 980 180, 1100 108 C 1150 78, 1185 62, 1200 55"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                style={{ pathLength: lineLength }}
+              />
+            </svg>
+          </div>
         </div>
 
         {/* rough brush edge: black hands off to the cream shelf */}
