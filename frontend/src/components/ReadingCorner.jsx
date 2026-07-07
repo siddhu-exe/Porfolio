@@ -133,22 +133,9 @@ const fadeUp = {
 export default function ReadingCorner() {
   return (
     <section id="reading" className="relative overflow-hidden bg-black text-cream">
-      {/* transition in: the espresso Toolbox tears down into the black */}
-      <svg
-        viewBox="0 0 1440 70"
-        preserveAspectRatio="none"
-        aria-hidden
-        className="relative z-10 block h-8 w-full text-bark md:h-12"
-      >
-        <path
-          fill="currentColor"
-          d="M0,0 L1440,0 L1440,32 C 1400,44 1360,26 1320,36 C 1280,46 1240,28 1200,34
-             C 1160,40 1120,50 1080,40 C 1040,30 1000,26 960,34 C 920,42 880,48 840,38
-             C 800,28 760,26 720,32 C 680,38 640,50 600,42 C 560,34 520,26 480,32
-             C 440,38 400,48 360,40 C 320,32 280,26 240,34 C 200,42 160,50 120,40
-             C 80,30 40,28 0,36 Z"
-        />
-      </svg>
+      {/* The Toolbox → Reading Corner seam is drawn by <ScrollMorphEdge> in
+          Home.jsx (a velocity-reactive morphing curve), so there is no static
+          edge here. Top padding below leaves room for that overlay. */}
 
       {/* faint dot grid on black */}
       <div
@@ -156,7 +143,7 @@ export default function ReadingCorner() {
         className="absolute inset-0 [background-image:radial-gradient(rgba(247,241,237,0.06)_1px,transparent_1px)] [background-size:26px_26px]"
       />
 
-      <div className="relative px-6 pb-24 pt-8 md:px-16 md:pb-32 md:pt-12">
+      <div className="relative px-6 pb-24 pt-10 md:px-16 md:pb-32 md:pt-14">
         <motion.header
           className="mx-auto mb-14 max-w-2xl text-center md:mb-20"
           variants={fadeUp}

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePageTransition } from './PageTransition.jsx';
 
@@ -37,7 +38,10 @@ export default function BookModal({ project, onClose }) {
     };
   }, [project, onClose]);
 
-  return (
+  // Portal to <body> so the modal's fixed positioning resolves against the
+  // viewport — the Project Shelf can be pinned (transformed) by GSAP, and a
+  // transformed ancestor would otherwise break `position: fixed`.
+  return createPortal(
     <AnimatePresence>
       {project && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:p-8">
@@ -187,6 +191,7 @@ export default function BookModal({ project, onClose }) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

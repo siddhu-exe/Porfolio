@@ -6,6 +6,8 @@ import ProjectShelf from '../components/ProjectShelf.jsx';
 import Toolbox from '../components/Toolbox.jsx';
 import ReadingCorner from '../components/ReadingCorner.jsx';
 import Footer from '../components/Footer.jsx';
+import PinnedCurtain from '../components/PinnedCurtain.jsx';
+import ScrollMorphEdge from '../components/ScrollMorphEdge.jsx';
 import ContactModal from '../components/ContactModal.jsx';
 import { fetchProjects } from '../api.js';
 import { fallbackProjects } from '../data/fallbackProjects.js';

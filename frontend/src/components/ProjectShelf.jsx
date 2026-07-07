@@ -66,7 +66,7 @@ export default function ProjectShelf({ projects }) {
         </svg>
       </div>
 
-      <div className="relative px-8 pb-24 pt-16 text-ink md:px-16 md:pb-32 md:pt-24">
+      <div className="relative px-8 pb-40 pt-16 text-ink md:px-16 md:pb-24 md:pt-24">
         <motion.header
           className="mx-auto mb-16 max-w-3xl text-center md:mb-24"
           variants={fadeUp}
