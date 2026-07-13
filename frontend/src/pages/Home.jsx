@@ -6,8 +6,7 @@ import ProjectShelf from '../components/ProjectShelf.jsx';
 import Toolbox from '../components/Toolbox.jsx';
 import ReadingCorner from '../components/ReadingCorner.jsx';
 import Footer from '../components/Footer.jsx';
-import PinnedCurtain from '../components/PinnedCurtain.jsx';
-import ScrollMorphEdge from '../components/ScrollMorphEdge.jsx';
+import PinnedCurtainChain from '../components/PinnedCurtainChain.jsx';
 import ContactModal from '../components/ContactModal.jsx';
 import { fetchProjects } from '../api.js';
 import { fallbackProjects } from '../data/fallbackProjects.js';
@@ -55,20 +54,18 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Color shift (brush edge) into the cream shelf — no motion here. */}
-        <div className="relative z-30">
-          <ProjectShelf projects={projects} />
-        </div>
-
-        {/* Toolbox section (dark brown) sits below the shelf. */}
-        <div className="relative z-30">
-          <Toolbox />
-        </div>
-
-        {/* Reading Corner (black) — articles as little books. */}
-        <div className="relative z-30">
-          <ReadingCorner />
-        </div>
+        {/* Stage transitions #2 + #3, chained: Shelf pins while Toolbox
+            curtains over it; Toolbox then pins (holding a dwell beat so a fast
+            scroller actually sees it) while Reading Corner curtains over that.
+            Each section is mounted exactly once and shared between the two
+            transitions it participates in — no duplicate sections. */}
+        <PinnedCurtainChain
+          sections={[
+            { node: <ProjectShelf projects={projects} /> },
+            { node: <Toolbox /> },
+            { node: <ReadingCorner />, dwellVh: 70 },
+          ]}
+        />
 
         {/* Stage transition #2, mirrored: the page's bottom edge is the podium
             in reverse — the black Reading Corner lifts away step by step,

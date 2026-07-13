@@ -134,6 +134,24 @@ _APPROACH_STEPS = {
     "AI Applications": ["Ingest", "Embed", "Retrieve", "Generate", "Serve"],
 }
 
+# Gallery sections shown on the Chapter page, in this fixed order. Every
+# project gets all five (data-driven — no per-project markup); `images` counts
+# per section drive the gallery layout (1 = full width, 2 = side-by-side,
+# 3+ = horizontal scroll). Projects with fewer real assets can list 1 image and
+# still get the right layout automatically.
+_GALLERY_TEMPLATE = [
+    ("architecture", "Architecture", "The complete system architecture, from data collection to prediction.", 1),
+    ("pipeline", "Data Pipeline", "From raw football data to production-ready predictions.", 2),
+    ("ml", "Machine Learning", "How the model learns, evaluates, and predicts tournament outcomes.", 3),
+    ("platform", "Platform", "Interactive dashboards and prediction experiences built for users.", 2),
+    ("results", "Results", "The final outcome of the project and its key achievements.", 1),
+]
+
+# Per-project emoji + year for the Chapter page header, keyed by title.
+_HEADER_META = {
+    "FIFA World Cup Predictor": {"emoji": "⚽", "year": 2026},
+}
+
 # Per-project case-study copy, keyed by title. Every field is optional; the
 # builder fills sensible defaults so the page always renders.
 _DETAILS = {
@@ -208,6 +226,9 @@ _DETAILS = {
     },
     "FIFA World Cup Predictor": {
         "subtitle": "Forecasting matches from decades of form.",
+        "description": "An AI-powered platform that predicts FIFA World Cup outcomes using "
+        "machine learning, statistical modeling, and real-world football data. Designed to "
+        "transform complex tournament analysis into interactive predictions and insights.",
         "problem": "Predicting knockout football is hard: upsets are the point of the sport, "
         "and history is noisy and unbalanced across teams.",
         "data_text": "Historical international fixtures with scores, tournament context and "
@@ -218,6 +239,12 @@ _DETAILS = {
         "result_visual": False,
         "reflection": "The model was most useful when it was uncertain — its close calls "
         "mapped almost perfectly onto the games everyone found thrilling.",
+        # Example only — remove/replace once real diagrams are ready. Demonstrates
+        # that gallery_overrides lets one project deviate from the shared
+        # _GALLERY_TEMPLATE image counts (see docs/CHAPTER_PAGE.md).
+        # "gallery_overrides": {
+        #     "architecture": ["/images/fifa-world-cup-predictor/architecture.png"],
+        # },
     },
     "Alzheimer's MRI Detection": {
         "subtitle": "Reading brain scans stage by stage.",
@@ -297,6 +324,20 @@ def build_projects():
                 return f"https://placehold.co/{w}x{h}/{bare}/F7F1ED?text={text}"
 
             steps = _APPROACH_STEPS.get(category, ["Explore", "Build", "Ship"])
+            meta = _HEADER_META.get(title, {})
+            gallery_overrides = d.get("gallery_overrides", {})
+
+            gallery = [
+                {
+                    "key": key,
+                    "heading": heading,
+                    "subtitle": subtitle,
+                    "images": gallery_overrides.get(key) or [
+                        _img(f"{title} — {heading} {n + 1}", 900, 600) for n in range(count)
+                    ],
+                }
+                for key, heading, subtitle, count in _GALLERY_TEMPLATE
+            ]
 
             projects.append({
                 "id": idx,
@@ -304,13 +345,15 @@ def build_projects():
                 "slug": slug,
                 "category": category,
                 "color": color,
+                "emoji": meta.get("emoji", "📘"),
+                "year": meta.get("year", 2026),
                 "subtitle": d.get("subtitle", description.split(".")[0] + "."),
                 "thumbnail": (
                     f"https://placehold.co/600x400/{bare}/171717"
                     f"?text={category.replace(' ', '+')}"
                 ),
                 "heroImage": _img(title),
-                "description": description,
+                "description": d.get("description", description),
                 "problem": d.get("problem", description),
                 "data": {
                     "text": d.get("data_text", "A curated dataset assembled and cleaned for "
@@ -329,10 +372,20 @@ def build_projects():
                     "github": "https://github.com/",
                     "demo": None,
                 },
+                "gallery": gallery,
                 "images": [],
                 "project_url": f"/projects/{slug}",
                 "tech_stack": tech,
             })
+
+    # Chapter nav: adjacent projects in the same flat, cross-shelf order the
+    # shelf itself renders in (previous/next "chapter").
+    for i, p in enumerate(projects):
+        prev_p = projects[i - 1] if i > 0 else None
+        next_p = projects[i + 1] if i < len(projects) - 1 else None
+        p["prev"] = {"slug": prev_p["slug"], "title": prev_p["title"]} if prev_p else None
+        p["next"] = {"slug": next_p["slug"], "title": next_p["title"]} if next_p else None
+
     return projects
 
 

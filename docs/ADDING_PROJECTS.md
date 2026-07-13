@@ -33,6 +33,9 @@ when the backend is unreachable, so the shelf never renders empty.
 You do **not** need to touch the book spine, modal, or Chapter page components —
 they are data-driven and render whatever the backend returns.
 
+> For the Chapter page's gallery sections specifically (images, layout rules,
+> `emoji`/`year`, chapter nav), see [`CHAPTER_PAGE.md`](CHAPTER_PAGE.md).
+
 ---
 
 ## The project data shape
@@ -42,29 +45,52 @@ Every project the API returns looks like this (built in `backend/data.py`):
 ```jsonc
 {
   "id": 3,
-  "title": "Loan Approval Predictor",
-  "slug": "loan-approval-predictor",     // auto-generated from title
-  "category": "Machine Learning",         // MUST match a shelf name exactly
-  "color": "#7FA98F",                      // spine + cover color (from PALETTE)
-  "subtitle": "A fairer, faster first look at applications.",
-  "thumbnail": "https://.../...",          // small shelf/preview image
-  "heroImage": "https://.../...",          // large image on the Chapter page
-  "description": "…",                       // shown in the book-preview modal
-  "problem": "…",                           // Chapter: THE PROBLEM
-  "data": { "text": "…", "visual": null },  // Chapter: THE DATA (visual optional)
-  "approach": { "steps": [{ "label": "Train" }, …] }, // Chapter: THE APPROACH
-  "result": { "metric": "0.91", "label": "ROC-AUC", "visual": null }, // THE RESULT
-  "reflection": "…",                        // Chapter: THE REFLECTION
-  "links": { "github": "https://…", "demo": null },
+  "title": "FIFA World Cup Predictor",
+  "slug": "fifa-world-cup-predictor",      // auto-generated from title
+  "category": "Machine Learning",           // MUST match a shelf name exactly
+  "color": "#7FA98F",                        // spine + cover + gallery-placeholder color
+  "emoji": "⚽",                             // shown next to the title on the Chapter page header
+  "year": 2026,                              // shown top-right on the Chapter page header
+  "subtitle": "Forecasting matches from decades of form.",
+  "thumbnail": "https://.../...",            // small shelf/preview image
+  "heroImage": "https://.../...",            // (legacy) large image, no longer shown on the Chapter page
+  "description": "…",                         // shown in the book-preview modal AND the Chapter page intro
+  "problem": "…",                             // (legacy, kept for the book-preview modal / API consumers)
+  "data": { "text": "…", "visual": null },    // (legacy, same as above)
+  "approach": { "steps": [{ "label": "Train" }, …] }, // (legacy, same as above)
+  "result": { "metric": "0.91", "label": "ROC-AUC", "visual": null }, // (legacy)
+  "reflection": "…",                          // (legacy)
+  "links": { "github": "https://…", "demo": null }, // Chapter page closing row
+  "gallery": [                                // Chapter page gallery sections, IN ORDER
+    { "key": "architecture", "heading": "Architecture", "subtitle": "…", "images": ["https://…"] },
+    { "key": "pipeline",     "heading": "Data Pipeline", "subtitle": "…", "images": ["https://…", "https://…"] },
+    { "key": "ml",           "heading": "Machine Learning", "subtitle": "…", "images": ["…", "…", "…"] },
+    { "key": "platform",     "heading": "Platform", "subtitle": "…", "images": ["…", "…"] },
+    { "key": "results",      "heading": "Results", "subtitle": "…", "images": ["…"] }
+  ],
+  "prev": { "slug": "loan-approval-predictor", "title": "Loan Approval Predictor" }, // or null
+  "next": { "slug": "alzheimer-s-mri-detection", "title": "Alzheimer's MRI Detection" }, // or null
   "images": [],
   "tech_stack": ["scikit-learn", "XGBoost", "Pandas"]
 }
 ```
 
-- `visual` fields are **optional** — set to `null` and the section renders as
-  text-only (no empty box). Provide an image URL to show it.
-- `slug`, `thumbnail`, `heroImage`, and the visual placeholder images are
-  generated automatically; you normally only write the text fields.
+- `visual`/`gallery[].images` entries are the only "optional media" fields —
+  `null`/empty renders as a placeholder block in the project's `color`, so
+  nothing ever looks broken before real images are ready.
+- `slug`, `thumbnail`, `heroImage`, `gallery[].images` placeholders, and
+  `prev`/`next` are **all generated automatically**. You normally only write
+  the text fields (title, tech, description, and the optional `_DETAILS` copy).
+- `problem`, `data`, `approach`, `result`, `reflection` are **legacy fields**
+  kept in the API response for any older consumer, but the current Chapter
+  page (see below) does **not** render them — it renders `gallery` instead.
+  You can still fill `_DETAILS` for them (harmless), but they're not required.
+
+> 📖 **For a full walkthrough of the Chapter page's exact layout, the gallery
+> image-count rules, and how to customize per-project galleries**, see
+> [`CHAPTER_PAGE.md`](CHAPTER_PAGE.md) in this folder. This file (`ADDING_PROJECTS.md`)
+> covers the shelf/book side; that one covers the full case-study page you land
+> on after clicking **View Full Project**.
 
 ---
 
@@ -201,17 +227,16 @@ write:
 - inside: `thumbnail`/`heroImage`, `description`, `tech_stack`
 - button: **View Full Project** → `/projects/{slug}`
 
-**Chapter page** (`/projects/:slug`):
+**Chapter page** (`/projects/:slug`) — see [`CHAPTER_PAGE.md`](CHAPTER_PAGE.md) for
+the full breakdown, summarized here:
 | Section | Field |
 |---------|-------|
-| Header | `category`, `title`, `subtitle` |
-| Hero visual | `heroImage` |
-| The Problem | `problem` |
-| The Data | `data.text` (+ optional `data.visual`) |
-| The Approach | `approach.steps[]` (from `_APPROACH_STEPS`) |
-| The Result | `result.metric` + `result.label` (+ optional `result.visual`) |
-| The Reflection | `reflection` |
-| Closing | `links.github`, `links.demo` (optional), `tech_stack` |
+| Header | `emoji`, `title`, `category`, `year` |
+| Description | `description` |
+| Stack row | `tech_stack[]` |
+| Gallery sections (×5, in order) | `gallery[]` — each `{ heading, subtitle, images[] }` |
+| Closing row | `links.github`, `links.demo` (optional) |
+| Chapter nav | `prev` / `next` (auto-computed) |
 
 ---
 
@@ -224,10 +249,11 @@ force a specific color for a project, set `color` explicitly on that project in
 
 ## Real images later
 
-`thumbnail`, `heroImage`, `data.visual`, and `result.visual` currently use
+`thumbnail`, `heroImage`, and every `gallery[].images` entry currently use
 `placehold.co` placeholders tinted to the project color. Replace them with real
 image URLs (or local `/public` paths) when available — the layout already
-supports them and the optional visuals appear only when set.
+supports them; see [`CHAPTER_PAGE.md`](CHAPTER_PAGE.md) for exactly how the
+gallery's image count controls its layout.
 
 ## Quick checklist for a new book
 

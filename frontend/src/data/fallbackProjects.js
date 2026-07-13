@@ -40,8 +40,8 @@ const CATS = [
 ];
 
 let counter = 0;
-export const fallbackProjects = CATS.flatMap(({ category, projects }) =>
-  projects.map(({ title, tech }) => {
+const projects = CATS.flatMap(({ category, projects: catProjects }) =>
+  catProjects.map(({ title, tech }) => {
     const id = ++counter;
     return {
       id,
@@ -60,3 +60,13 @@ export const fallbackProjects = CATS.flatMap(({ category, projects }) =>
     };
   })
 );
+
+// Chapter nav: adjacent projects in flat order, same convention as the backend.
+projects.forEach((p, i) => {
+  const prevP = projects[i - 1];
+  const nextP = projects[i + 1];
+  p.prev = prevP ? { slug: prevP.slug, title: prevP.title } : null;
+  p.next = nextP ? { slug: nextP.slug, title: nextP.title } : null;
+});
+
+export const fallbackProjects = projects;

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 /**
@@ -25,7 +26,12 @@ export default function CursorBadge({ active, centered = true, className = '', c
 
   if (!finePointer) return null;
 
-  return (
+  // Portal to <body>: this badge is rendered from inside sections that can be
+  // pinned/transformed by GSAP ScrollTrigger (e.g. the Project Shelf). A
+  // transformed ancestor turns `position: fixed` into "fixed to that ancestor",
+  // which sends the badge off-screen. Escaping to <body> keeps it fixed to the
+  // real viewport no matter what's animating around it.
+  return createPortal(
     <motion.div
       className="pointer-events-none fixed left-0 top-0 z-[80]"
       style={{ x: sx, y: sy }}
@@ -39,6 +45,7 @@ export default function CursorBadge({ active, centered = true, className = '', c
       >
         {children}
       </div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 }

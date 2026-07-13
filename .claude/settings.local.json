@@ -31,7 +31,8 @@
       "Bash(curl -s -o /dev/null -w \"api retry: %{http_code}\\\\n\" http://localhost:8000/api/health)",
       "Bash(node scripts/verify.mjs)",
       "Bash(curl -s -X POST http://localhost:8000/api/contact -H 'Content-Type: application/json' -d '{\"name\":\"Test User\",\"email\":\"test@example.com\",\"message\":\"Hello, this is a test message.\"}')",
-      "Bash(curl -s -X POST http://localhost:8000/api/contact -H 'Content-Type: application/json' -d '{\"name\":\"\",\"email\":\"bad\",\"message\":\"x\"}' -o /dev/null -w \"invalid payload -> %{http_code}\\\\n\")"
+      "Bash(curl -s -X POST http://localhost:8000/api/contact -H 'Content-Type: application/json' -d '{\"name\":\"\",\"email\":\"bad\",\"message\":\"x\"}' -o /dev/null -w \"invalid payload -> %{http_code}\\\\n\")",
+      "Bash(python3 -c ' *)"
     ]
   }
 }

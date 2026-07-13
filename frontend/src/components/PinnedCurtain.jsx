@@ -21,10 +21,16 @@ gsap.registerPlugin(ScrollTrigger);
  * Wraps the sections without modifying them:
  *   <PinnedCurtain base={<ProjectShelf/>} curtain={<Toolbox/>} />
  *
+ * `dwellVh` (default 0) adds extra pinned scroll AFTER the reveal finishes —
+ * the base stays pinned and the curtain sits fully covering the screen for
+ * that many extra viewport-heights before the pin releases. This forces a
+ * scroller to spend a beat inside the curtain section instead of blowing
+ * straight through it.
+ *
  * Below md the whole effect is skipped (touch-scroll pinning is jank-prone):
  * the sections stack in normal flow with a light fade-in on the curtain.
  */
-export default function PinnedCurtain({ base, curtain }) {
+export default function PinnedCurtain({ base, curtain, dwellVh = 0 }) {
   const pinRef = useRef(null);
   const curtainRef = useRef(null);
 
@@ -36,11 +42,17 @@ export default function PinnedCurtain({ base, curtain }) {
       gsap.set(curtainRef.current, { marginTop: '-100vh' });
       gsap.set(curtainRef.current, { yPercent: 100 });
 
+      // One viewport of scroll drives the reveal (0% -> 100%); an optional
+      // extra `dwellVh` keeps the pin held (curtain fully covering) afterward.
+      const revealVh = 100;
+      const totalVh = revealVh + dwellVh;
+      const revealFraction = revealVh / totalVh;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pinRef.current,
           start: 'bottom bottom', // pin when the base's end hits the viewport bottom
-          end: '+=100%', // one viewport of scroll drives the full reveal
+          end: `+=${totalVh}%`,
           pin: pinRef.current,
           pinSpacing: true,
           scrub: 0.6, // light smoothing so fast flicks don't stutter
@@ -48,7 +60,13 @@ export default function PinnedCurtain({ base, curtain }) {
           invalidateOnRefresh: true,
         },
       });
-      tl.to(curtainRef.current, { yPercent: 0, ease: 'none' });
+      // Reveal animates over the first slice of the track; the remaining
+      // slice (dwellVh) is scrubbed scroll with nothing left to animate, so
+      // the pin just holds the fully-covered curtain in place.
+      tl.to(curtainRef.current, { yPercent: 0, ease: 'none', duration: revealFraction }, 0);
+      if (dwellVh > 0) {
+        tl.to(curtainRef.current, { yPercent: 0, duration: 1 - revealFraction }, revealFraction);
+      }
 
       return () => {
         tl.scrollTrigger?.kill();
@@ -78,7 +96,12 @@ export default function PinnedCurtain({ base, curtain }) {
     const onLoad = () => ScrollTrigger.refresh();
     window.addEventListener('load', onLoad);
 
+    // Shelf height shifts when async project data arrives — keep pin point accurate.
+    const ro = new ResizeObserver(() => ScrollTrigger.refresh());
+    if (pinRef.current) ro.observe(pinRef.current);
+
     return () => {
+      ro.disconnect();
       window.removeEventListener('load', onLoad);
       mm.revert();
     };

@@ -34,7 +34,7 @@ function ToolIcon({ name, slug }) {
     <img
       src={`https://cdn.simpleicons.org/${slug}`}
       alt={name}
-      className="h-7 w-7 md:h-8 md:w-8"
+      className="h-5 w-5 md:h-6 md:w-6"
       loading="lazy"
       draggable={false}
       onError={() => setFailed(true)}
@@ -70,11 +70,11 @@ function HangingTool({ name, slug, stringLen }) {
         />
 
         {/* matte tile holding the icon */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#241609] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_12px_22px_rgba(0,0,0,0.55)] md:h-[4.4rem] md:w-[4.4rem]">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#241609] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_10px_18px_rgba(0,0,0,0.55)] md:h-14 md:w-14">
           <ToolIcon name={name} slug={slug} />
         </div>
 
-        <span className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/45">
+        <span className="mt-2 text-[9px] font-semibold uppercase tracking-[0.15em] text-cream/45 md:text-[10px]">
           {name}
         </span>
       </motion.div>
@@ -101,16 +101,16 @@ function Screw({ className }) {
 
 export default function Toolbox() {
   // Stagger cord lengths per column so the rack looks hand-hung, not gridded.
-  const stringLens = [14, 24, 18, 28, 20];
+  const stringLens = [10, 18, 13, 21, 15];
 
   return (
-    <section id="toolbox" className="relative overflow-hidden bg-bark text-cream">
+    <section id="toolbox" className="relative flex h-screen flex-col overflow-hidden bg-bark text-cream">
       {/* transition in: the cream shelf tears down into the espresso */}
       <svg
         viewBox="0 0 1440 70"
         preserveAspectRatio="none"
         aria-hidden
-        className="relative z-10 block h-8 w-full text-cream md:h-12"
+        className="relative z-10 block h-6 w-full shrink-0 text-cream md:h-9"
       >
         <path
           fill="currentColor"
@@ -128,25 +128,25 @@ export default function Toolbox() {
         className="absolute inset-0 [background:radial-gradient(110%_90%_at_50%_10%,rgba(199,160,121,0.08),transparent_55%),radial-gradient(120%_80%_at_50%_100%,rgba(0,0,0,0.6),transparent)]"
       />
 
-      <div className="relative px-4 pb-14 pt-4 md:px-10 md:pb-20 md:pt-6">
+      <div className="relative flex min-h-0 flex-1 flex-col justify-center px-4 py-4 md:px-10 md:py-6">
         <motion.header
-          className="mx-auto mb-8 max-w-3xl text-center md:mb-12"
+          className="mx-auto mb-5 max-w-3xl shrink-0 text-center md:mb-7"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
         >
-          <h2 className="text-3xl font-bold tracking-tight text-cream md:text-5xl">
+          <h2 className="text-2xl font-bold tracking-tight text-cream md:text-4xl">
             Tools Behind Every Chapter
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm text-cream/55 md:text-base">
+          <p className="mx-auto mt-2 max-w-lg text-xs text-cream/55 md:text-sm">
             The technologies that bring these ideas to life.
           </p>
         </motion.header>
 
         {/* walnut rack panel */}
         <motion.div
-          className="relative mx-auto max-w-5xl rounded-2xl bg-gradient-to-b from-barklight to-[#1F1207] px-5 py-7 ring-1 ring-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] md:px-12 md:py-9"
+          className="relative mx-auto w-full max-w-4xl shrink-0 rounded-2xl bg-gradient-to-b from-barklight to-[#1F1207] px-4 py-5 ring-1 ring-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] md:px-10 md:py-7"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
@@ -164,7 +164,7 @@ export default function Toolbox() {
           <Screw className="bottom-3 left-3" />
           <Screw className="bottom-3 right-3" />
 
-          <div className="relative grid grid-cols-3 gap-x-3 gap-y-7 sm:grid-cols-5 md:gap-x-6 md:gap-y-8">
+          <div className="relative grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-5 md:gap-x-5 md:gap-y-6">
             {TOOLS.map((t, i) => (
               <HangingTool
                 key={t.name}

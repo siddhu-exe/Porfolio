@@ -4,100 +4,32 @@ import { motion } from 'framer-motion';
 import { fetchProject } from '../api.js';
 import { fallbackProjects } from '../data/fallbackProjects.js';
 import { usePageTransition } from '../components/PageTransition.jsx';
+import ImageGallery from '../components/ImageGallery.jsx';
 
 const EASE = [0.22, 1, 0.36, 1];
 
-// Category -> approach steps, mirrored for the offline fallback.
-const APPROACH_STEPS = {
-  'Data Analytics': ['Collect', 'Clean', 'Explore', 'Insight'],
-  'Data Visualization': ['Model Data', 'Design', 'Build', 'Publish'],
-  'Machine Learning': ['Data Prep', 'Features', 'Train', 'Evaluate', 'Tune'],
-  'Deep Learning': ['Collect', 'Augment', 'Build CNN', 'Train', 'Validate'],
-  'AI Applications': ['Ingest', 'Embed', 'Retrieve', 'Generate', 'Serve'],
-};
+// Mirrors backend/data.py's _GALLERY_TEMPLATE so the offline fallback shows
+// the same section structure (with placeholder-only images).
+const GALLERY_TEMPLATE = [
+  { key: 'architecture', heading: 'Architecture', subtitle: 'The complete system architecture, from data collection to prediction.', count: 1 },
+  { key: 'pipeline', heading: 'Data Pipeline', subtitle: 'From raw football data to production-ready predictions.', count: 2 },
+  { key: 'ml', heading: 'Machine Learning', subtitle: 'How the model learns, evaluates, and predicts tournament outcomes.', count: 3 },
+  { key: 'platform', heading: 'Platform', subtitle: 'Interactive dashboards and prediction experiences built for users.', count: 2 },
+  { key: 'results', heading: 'Results', subtitle: 'The final outcome of the project and its key achievements.', count: 1 },
+];
 
-// Fill case-study fields for a bare fallback project so the page still renders.
+// Fill fields for a bare fallback project so the page still renders fully.
 function enrich(p) {
-  const steps = (APPROACH_STEPS[p.category] || ['Explore', 'Build', 'Ship']).map((label) => ({ label }));
   return {
+    emoji: p.emoji || '📘',
+    year: p.year || new Date().getFullYear(),
     subtitle: p.subtitle || `${p.description.split('.')[0]}.`,
-    heroImage: p.heroImage || null,
-    problem: p.problem || p.description,
-    data: p.data || { text: 'A curated dataset assembled and cleaned for this project.', visual: null },
-    approach: p.approach || { steps },
-    result: p.result || { metric: '—', label: 'headline outcome', visual: null },
-    reflection: p.reflection || 'Every project on the shelf leaves a lesson behind.',
+    gallery: p.gallery || GALLERY_TEMPLATE.map((g) => ({ ...g, images: Array(g.count).fill(null) })),
     links: p.links || { github: null, demo: null },
+    prev: p.prev || null,
+    next: p.next || null,
     ...p,
   };
-}
-
-function SectionLabel({ children }) {
-  return (
-    <div className="mb-5 flex items-center gap-3">
-      <span className="h-2 w-2 rounded-full bg-terracotta" />
-      <span className="text-xs font-semibold uppercase tracking-[0.25em] text-ink/50">{children}</span>
-    </div>
-  );
-}
-
-function Framed({ src, alt, color, ratio = 'aspect-[16/9]' }) {
-  return (
-    <div
-      className={`overflow-hidden rounded-2xl border border-ink/15 shadow-sm ${ratio}`}
-      style={{ backgroundColor: color }}
-    >
-      {src ? (
-        <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center px-6 text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-cream/90">{alt}</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Data-driven horizontal step flow; goes vertical below md. */
-function StepFlow({ steps }) {
-  const inset = `${50 / steps.length}%`;
-  return (
-    <>
-      {/* horizontal */}
-      <div className="hidden md:block">
-        <div className="relative flex justify-between">
-          <span className="absolute top-5 h-px bg-ink/20" style={{ left: inset, right: inset }} />
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              className="relative z-10 flex flex-1 flex-col items-center px-2 text-center"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.08, ease: EASE }}
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/25 bg-cream text-sm font-bold text-ink">
-                {i + 1}
-              </span>
-              <span className="mt-3 text-sm font-medium text-ink/80">{step.label}</span>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* vertical */}
-      <ol className="relative ml-1 space-y-6 border-l border-ink/20 pl-8 md:hidden">
-        {steps.map((step, i) => (
-          <li key={i} className="relative">
-            <span className="absolute -left-[2.6rem] flex h-9 w-9 items-center justify-center rounded-full border border-ink/25 bg-cream text-sm font-bold text-ink">
-              {i + 1}
-            </span>
-            <span className="text-base font-medium text-ink/80">{step.label}</span>
-          </li>
-        ))}
-      </ol>
-    </>
-  );
 }
 
 const reveal = {
@@ -105,16 +37,26 @@ const reveal = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
-function Section({ children, className = '' }) {
+function Divider() {
+  return <div className="border-t border-ink/10" />;
+}
+
+function GallerySection({ section, color }) {
   return (
     <motion.section
-      className={`border-t border-ink/10 py-14 md:py-20 ${className}`}
+      className="py-14 md:py-20"
       variants={reveal}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: '-80px' }}
     >
-      {children}
+      <h2 className="text-3xl font-bold tracking-tight text-ink md:text-4xl">{section.heading}</h2>
+      <p className="mt-2 max-w-xl text-base italic leading-relaxed text-ink/55 md:text-lg">
+        {section.subtitle}
+      </p>
+      <div className="mt-8 md:mt-10">
+        <ImageGallery images={section.images} color={color} alt={section.heading} />
+      </div>
     </motion.section>
   );
 }
@@ -146,7 +88,12 @@ export default function ProjectDetail() {
   }, [slug]);
 
   const goBack = () =>
-    transitionTo('/', { color: '#171717', title: 'Back to the Shelf', category: 'The Library' });
+    transitionTo('/', { color: '#171717', title: 'Back to the Library', category: 'The Library' });
+
+  const goToProject = (p) => {
+    if (!p) return;
+    transitionTo(`/projects/${p.slug}`, { color: '#171717', title: p.title, category: 'Chapter' });
+  };
 
   if (status === 'loading') {
     return (
@@ -161,15 +108,15 @@ export default function ProjectDetail() {
       <main className="dot-grid flex min-h-screen flex-col items-center justify-center gap-6 bg-cream px-8 text-center">
         <h1 className="text-4xl font-bold tracking-headline text-ink">Chapter not found</h1>
         <button onClick={goBack} className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-cream transition-transform hover:scale-105">
-          &larr; Back to the Shelf
+          &larr; Back to the Library
         </button>
       </main>
     );
   }
 
-  const chapter = String(Math.ceil((project.id || 1) / 2)).padStart(2, '0');
   const hasDemo = project.links?.demo;
   const hasGithub = project.links?.github;
+  const gallery = project.gallery || [];
 
   return (
     <motion.main
@@ -179,115 +126,97 @@ export default function ProjectDetail() {
       transition={{ duration: 0.5, ease: EASE }}
     >
       <div className="mx-auto max-w-4xl px-8 md:px-16">
-        {/* 1. Nav row */}
-        <div className="flex items-center justify-between py-6 text-xs font-semibold uppercase tracking-widest text-ink/60">
+        {/* 1. Breadcrumb nav */}
+        <div className="flex items-center py-6 text-xs font-semibold uppercase tracking-widest text-ink/60">
           <button onClick={goBack} className="transition-colors hover:text-ink">
-            &larr; Back to Shelf
+            &larr; Back to Library
           </button>
-          <span className="text-ink/40">Chapter {chapter}</span>
         </div>
 
-        {/* 2. Header block */}
-        <header className="border-t border-ink/10 pb-10 pt-12 md:pb-14 md:pt-16">
-          <span className="inline-block rounded-full border border-ink/20 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink/70">
-            {project.category}
-          </span>
-          <h1 className="mt-6 text-5xl font-bold leading-[0.95] tracking-headline text-ink md:text-7xl">
-            {project.title}
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg font-light leading-relaxed text-ink/60 md:text-xl">
-            {project.subtitle}
-          </p>
+        {/* 2. Header row */}
+        <header className="border-t border-ink/10 pb-8 pt-10 md:pb-10 md:pt-12">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <h1 className="flex items-center gap-3 text-4xl font-bold leading-[1.05] tracking-headline text-ink md:text-6xl">
+              <span aria-hidden>{project.emoji}</span>
+              <span>{project.title}</span>
+            </h1>
+
+            <div className="flex flex-col items-end gap-2 pt-1">
+              <span className="inline-block rounded-full border border-ink/20 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink/70">
+                {project.category}
+              </span>
+              <span className="text-sm font-medium text-ink/40">{project.year}</span>
+            </div>
+          </div>
         </header>
 
-        {/* 3. Hero visual */}
-        <motion.div variants={reveal} initial="hidden" animate="show">
-          <Framed src={project.heroImage} alt={project.title} color={project.color} ratio="aspect-[16/9]" />
-        </motion.div>
+        {/* 3. Description */}
+        <p className="max-w-2xl pb-10 text-lg leading-relaxed text-ink/80 md:pb-12 md:text-xl">
+          {project.description}
+        </p>
 
-        {/* 4. The Problem */}
-        <Section>
-          <SectionLabel>The Problem</SectionLabel>
-          <p className="max-w-2xl text-lg leading-relaxed text-ink/80">{project.problem}</p>
-        </Section>
+        <Divider />
 
-        {/* 5. The Data */}
-        <Section>
-          <SectionLabel>The Data</SectionLabel>
-          {project.data?.visual ? (
-            <div className="grid items-center gap-8 md:grid-cols-2">
-              <p className="text-lg leading-relaxed text-ink/80">{project.data.text}</p>
-              <Framed src={project.data.visual} alt={`${project.category} — Data`} color={project.color} ratio="aspect-[4/3]" />
-            </div>
+        {/* 4. Stack row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 py-6 md:py-8">
+          <span className="text-xs font-semibold uppercase tracking-widest text-ink/40">Stack</span>
+          <span className="text-sm font-medium text-ink/70 md:text-base">
+            {(project.tech_stack || []).join('  •  ')}
+          </span>
+        </div>
+
+        <Divider />
+
+        {/* 5. Gallery sections, each separated by a divider */}
+        {gallery.map((section, i) => (
+          <div key={section.key}>
+            <GallerySection section={section} color={project.color} />
+            {i < gallery.length - 1 && <Divider />}
+          </div>
+        ))}
+
+        <Divider />
+
+        {/* 6. Closing row */}
+        <div className="flex flex-wrap items-center gap-3 py-10 md:py-12">
+          {hasGithub && (
+            <a href={project.links.github} target="_blank" rel="noreferrer" className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-transform hover:scale-105">
+              GitHub &#8599;
+            </a>
+          )}
+          {hasDemo && (
+            <a href={project.links.demo} target="_blank" rel="noreferrer" className="rounded-full border border-ink/25 px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-cream">
+              Live Demo &#8599;
+            </a>
+          )}
+        </div>
+
+        <Divider />
+
+        {/* 7. Chapter nav footer */}
+        <div className="flex items-center justify-between gap-4 py-10 md:py-14">
+          {project.prev ? (
+            <button
+              onClick={() => goToProject(project.prev)}
+              className="max-w-[45%] text-left text-sm font-semibold text-ink/60 transition-colors hover:text-ink md:text-base"
+            >
+              &larr; Previous Chapter
+              <span className="mt-1 block truncate text-xs font-normal text-ink/40">{project.prev.title}</span>
+            </button>
           ) : (
-            <p className="max-w-2xl text-lg leading-relaxed text-ink/80">{project.data?.text}</p>
+            <span />
           )}
-        </Section>
-
-        {/* 6. The Approach */}
-        <Section>
-          <SectionLabel>The Approach</SectionLabel>
-          <div className="mt-8">
-            <StepFlow steps={project.approach?.steps || []} />
-          </div>
-        </Section>
-
-        {/* 7. The Result */}
-        <Section>
-          <SectionLabel>The Result</SectionLabel>
-          <div className="flex flex-col gap-2">
-            <span className="text-7xl font-bold tracking-headline text-ink md:text-8xl">
-              {project.result?.metric}
-            </span>
-            <span className="max-w-md text-base text-ink/60">{project.result?.label}</span>
-          </div>
-          {project.result?.visual && (
-            <div className="mt-10">
-              <Framed src={project.result.visual} alt={`${project.title} — Result`} color={project.color} ratio="aspect-[16/9]" />
-            </div>
+          {project.next ? (
+            <button
+              onClick={() => goToProject(project.next)}
+              className="max-w-[45%] text-right text-sm font-semibold text-ink/60 transition-colors hover:text-ink md:text-base"
+            >
+              Next Chapter &rarr;
+              <span className="mt-1 block truncate text-xs font-normal text-ink/40">{project.next.title}</span>
+            </button>
+          ) : (
+            <span />
           )}
-        </Section>
-
-        {/* 8. The Reflection */}
-        <Section>
-          <SectionLabel>The Reflection</SectionLabel>
-          <p className="max-w-xl text-lg font-light leading-loose text-ink/75">{project.reflection}</p>
-        </Section>
-
-        {/* 9. Closing row */}
-        <Section className="pb-0">
-          <div className="flex flex-wrap items-center gap-3">
-            {hasGithub && (
-              <a href={project.links.github} target="_blank" rel="noreferrer" className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-transform hover:scale-105">
-                GitHub &#8599;
-              </a>
-            )}
-            {hasDemo && (
-              <a href={project.links.demo} target="_blank" rel="noreferrer" className="rounded-full border border-ink/25 px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-cream">
-                Live Demo &#8599;
-              </a>
-            )}
-          </div>
-
-          {project.tech_stack?.length > 0 && (
-            <div className="mt-8">
-              <span className="text-xs font-semibold uppercase tracking-widest text-ink/40">Built with</span>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {project.tech_stack.map((t) => (
-                  <span key={t} className="rounded-full border border-ink/20 px-3 py-1 text-xs font-medium text-ink/70">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </Section>
-
-        {/* bottom back link */}
-        <div className="border-t border-ink/10 py-14 text-center">
-          <button onClick={goBack} className="rounded-full bg-ink px-7 py-3 text-sm font-semibold text-cream transition-transform hover:scale-105">
-            &larr; Back to the Shelf
-          </button>
         </div>
       </div>
     </motion.main>

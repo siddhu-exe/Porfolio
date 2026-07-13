@@ -55,3 +55,12 @@ body {
     cursor: none;
   }
 }
+
+/* Hides the scrollbar on horizontal-scroll galleries while staying scrollable */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
