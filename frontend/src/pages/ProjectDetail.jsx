@@ -125,7 +125,7 @@ export default function ProjectDetail() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: EASE }}
     >
-      <div className="mx-auto max-w-4xl px-8 md:px-16">
+      <div className="px-8 md:px-16">
         {/* 1. Breadcrumb nav */}
         <div className="flex items-center py-6 text-xs font-semibold uppercase tracking-widest text-ink/60">
           <button onClick={goBack} className="transition-colors hover:text-ink">
@@ -133,15 +133,15 @@ export default function ProjectDetail() {
           </button>
         </div>
 
-        {/* 2. Header row */}
-        <header className="border-t border-ink/10 pb-8 pt-10 md:pb-10 md:pt-12">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <h1 className="flex items-center gap-3 text-4xl font-bold leading-[1.05] tracking-headline text-ink md:text-6xl">
+        {/* 2. Header row — title left, category + year right, ONE line */}
+        <header className="border-t border-ink/10 py-8 md:py-10">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h1 className="flex items-center gap-3 text-3xl font-bold leading-[1.05] tracking-headline text-ink md:text-5xl">
               <span aria-hidden>{project.emoji}</span>
               <span>{project.title}</span>
             </h1>
 
-            <div className="flex flex-col items-end gap-2 pt-1">
+            <div className="flex items-center gap-3">
               <span className="inline-block rounded-full border border-ink/20 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink/70">
                 {project.category}
               </span>
@@ -155,10 +155,8 @@ export default function ProjectDetail() {
           {project.description}
         </p>
 
-        <Divider />
-
-        {/* 4. Stack row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 py-6 md:py-8">
+        {/* 4. Stack card — bordered/rounded container, not just dividers */}
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink/15 bg-ink/[0.03] px-6 py-5 md:px-8 md:py-6">
           <span className="text-xs font-semibold uppercase tracking-widest text-ink/40">Stack</span>
           <span className="text-sm font-medium text-ink/70 md:text-base">
             {(project.tech_stack || []).join('  •  ')}

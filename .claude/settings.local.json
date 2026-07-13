@@ -32,7 +32,17 @@
       "Bash(node scripts/verify.mjs)",
       "Bash(curl -s -X POST http://localhost:8000/api/contact -H 'Content-Type: application/json' -d '{\"name\":\"Test User\",\"email\":\"test@example.com\",\"message\":\"Hello, this is a test message.\"}')",
       "Bash(curl -s -X POST http://localhost:8000/api/contact -H 'Content-Type: application/json' -d '{\"name\":\"\",\"email\":\"bad\",\"message\":\"x\"}' -o /dev/null -w \"invalid payload -> %{http_code}\\\\n\")",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(git checkout *)",
+      "Bash(cat -A /dev/null; grep -n \"FooterRevealStage\\\\|PreFooterReveal\\\\|Footer\\\\b\" frontend/src/pages/Home.jsx)",
+      "Read(//dev/**)",
+      "Bash(kill 24029 24030)",
+      "Bash(rm -rf node_modules/.vite)",
+      "Bash(nohup npm run dev)",
+      "Bash(curl -s http://localhost:5173/ -o /dev/null -w \"5173: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:5174/ -o /dev/null -w \"5174: %{http_code}\\\\n\")",
+      "Bash(lsof -ti:5174)",
+      "Bash(xargs -r kill)"
     ]
   }
 }
