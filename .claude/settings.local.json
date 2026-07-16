@@ -52,7 +52,10 @@
       "Bash(echo \"exit:$?\")",
       "Bash(grep -oE 'addPropertyControls\\\\\\([^;]{0,400}' eyebtn-real.js)",
       "Bash(node -e \"console.log\\('framer-motion:', require\\('./node_modules/framer-motion/package.json'\\).version\\)\")",
-      "Bash(curl -sL \"https://framerusercontent.com/modules/5dCWb80pMX3rkZ6mTvF6/rPe7prLpTtzjXMR9Lynw/FollowEyes.js\" -o followeyes.js)"
+      "Bash(curl -sL \"https://framerusercontent.com/modules/5dCWb80pMX3rkZ6mTvF6/rPe7prLpTtzjXMR9Lynw/FollowEyes.js\" -o followeyes.js)",
+      "Bash(grep -oE 'addPropertyControls\\\\\\([^;]{0,600}' srt-real.js)",
+      "Bash(grep -oE '\"Masked Lines\"[^}]{0,200}|Masked[^,]{0,220}' srt-real.js)",
+      "Bash(grep -oE '@keyframes [^}]{0,300}|animation:[^;\"]{0,120}|translateY\\\\\\([^\\)]*\\\\\\)|cubic-bezier\\\\\\([^\\)]*\\\\\\)|[0-9.]+s ease[a-z-]*' srt-real.js)"
     ]
   }
 }

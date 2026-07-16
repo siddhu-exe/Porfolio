@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Signature from './Signature.jsx';
+import MaskedRevealText from './MaskedRevealText.jsx';
 
 const SOCIALS = [
   { label: 'GitHub', href: 'https://github.com/siddhu-exe' },
@@ -55,12 +56,14 @@ export default function Footer({ onReachOut, riseStyle }) {
               dongardivedeepak17@gmail.com
             </a>
           </div>
-        {/* ghost name with the signature floating over it */}
+        {/* ghost name with the signature floating over it — masked line reveal */}
         <div className="relative flex min-h-0 flex-1 items-center justify-center">
-          <h2 className="select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]">
-            <span className="block text-[11vw]">SIDDHARTH</span>
-            <span className="block text-[11vw]">DONGARDIVE</span>
-          </h2>
+          <MaskedRevealText
+            as="h2"
+            lines={['SIDDHARTH', 'DONGARDIVE']}
+            className="select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]"
+            lineClassName="text-[11vw]"
+          />
           <Signature className="absolute w-[200px] md:w-[300px]" />
         </div>
       </div>
