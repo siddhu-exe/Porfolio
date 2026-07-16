@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePageTransition } from './PageTransition.jsx';
+import EyeFollowButton from './EyeFollowButton.jsx';
 
 const EASE = [0.22, 1, 0.36, 1];
 // Cover flip + spread re-centering share this so the book stays physical.
@@ -110,7 +111,7 @@ export default function BookModal({ project, onClose }) {
                   )}
 
                   <motion.div variants={line}>
-                    <button
+                    <EyeFollowButton
                       onClick={() =>
                         transitionTo(`/projects/${project.slug}`, {
                           color: project.color,
@@ -118,10 +119,10 @@ export default function BookModal({ project, onClose }) {
                           category: project.category,
                         })
                       }
-                      className="mt-4 self-start rounded-full bg-ink px-5 py-2.5 text-xs font-semibold text-cream transition-transform hover:scale-105 md:mt-6 md:px-6 md:py-3 md:text-sm"
+                      className="mt-4 self-start md:mt-6"
                     >
-                      View Full Project &rarr;
-                    </button>
+                      View Full Project
+                    </EyeFollowButton>
                   </motion.div>
                 </motion.div>
               </div>

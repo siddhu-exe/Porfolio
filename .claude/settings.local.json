@@ -42,7 +42,17 @@
       "Bash(curl -s http://localhost:5173/ -o /dev/null -w \"5173: %{http_code}\\\\n\")",
       "Bash(curl -s http://localhost:5174/ -o /dev/null -w \"5174: %{http_code}\\\\n\")",
       "Bash(lsof -ti:5174)",
-      "Bash(xargs -r kill)"
+      "Bash(xargs -r kill)",
+      "Bash(node -e \"console.log\\('node', process.version\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(npx --no-install eslint src/components/Footer.jsx src/pages/Home.jsx)",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(curl -sL \"https://framer.com/m/Eye-Follow-Button-yMBK.js@UiZdcXLPs68fBczUfQ27\" -o framer-eyebtn.js)",
+      "Bash(curl -sL \"https://framerusercontent.com/modules/CaDed4uVS4F4koHi8Ddp/UiZdcXLPs68fBczUfQ27/kYiayLQ5g.js\" -o eyebtn-real.js)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(grep -oE 'addPropertyControls\\\\\\([^;]{0,400}' eyebtn-real.js)",
+      "Bash(node -e \"console.log\\('framer-motion:', require\\('./node_modules/framer-motion/package.json'\\).version\\)\")",
+      "Bash(curl -sL \"https://framerusercontent.com/modules/5dCWb80pMX3rkZ6mTvF6/rPe7prLpTtzjXMR9Lynw/FollowEyes.js\" -o followeyes.js)"
     ]
   }
 }

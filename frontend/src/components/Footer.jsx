@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Signature from './Signature.jsx';
 
 const SOCIALS = [
@@ -8,10 +9,12 @@ const SOCIALS = [
 
 /**
  * Fixed to the viewport bottom BEHIND the page (z-0 vs main's z-10). The page
- * content scrolls up and off it — same stage-like, scroll-linked reveal as the
- * hero -> shelf transition, mirrored.
+ * content scrolls up and off it, and as it does the footer's content RISES from
+ * bottom to top (via `riseStyle`, driven by Home's reveal window) and fades in
+ * — so the footer animates as part of the final transition instead of sitting
+ * there static (juanmora.co style).
  */
-export default function Footer({ onReachOut }) {
+export default function Footer({ onReachOut, riseStyle }) {
   const [time, setTime] = useState('');
 
   useEffect(() => {
@@ -36,6 +39,8 @@ export default function Footer({ onReachOut }) {
         className="absolute inset-0 [background-image:radial-gradient(rgba(23,23,23,0.16)_1.5px,transparent_1.5px)] [background-size:26px_26px]"
       />
 
+      {/* content rises bottom→top as the footer is revealed */}
+      <motion.div style={riseStyle} className="relative flex min-h-0 flex-1 flex-col">
       <div className="relative flex min-h-0 flex-1 flex-col px-8 pt-6 md:px-16">
         {/* top bar: socials + email */}
         <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-widest text-ink/70 md:text-xs">
@@ -126,6 +131,7 @@ export default function Footer({ onReachOut }) {
           </span>
         </div>
       </div>
+      </motion.div>
     </footer>
   );
 }

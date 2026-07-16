@@ -25,14 +25,21 @@ function initials(name) {
   return name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3).toUpperCase();
 }
 
+// Warm accent chips, rotated deterministically by index (not random) so the
+// rack reads as an intentional pattern: burnt orange, brick red, mustard gold.
+const ACCENTS = ['#E85D2C', '#C73E3E', '#C9963C'];
+
+// Cream used for glyphs, labels, borders and connectors across the section.
+const CREAM = 'F0E6D2';
+
 function ToolIcon({ name, slug }) {
   const [failed, setFailed] = useState(false);
   if (!slug || failed) {
-    return <span className="text-sm font-extrabold tracking-tight text-cream/80">{initials(name)}</span>;
+    return <span className="text-sm font-extrabold tracking-tight text-[#F0E6D2]">{initials(name)}</span>;
   }
   return (
     <img
-      src={`https://cdn.simpleicons.org/${slug}`}
+      src={`https://cdn.simpleicons.org/${slug}/${CREAM}`}
       alt={name}
       className="h-5 w-5 md:h-6 md:w-6"
       loading="lazy"
@@ -43,7 +50,7 @@ function ToolIcon({ name, slug }) {
 }
 
 /** A tool hanging from a brass nail; sweeps of the cursor set it swinging. */
-function HangingTool({ name, slug, stringLen }) {
+function HangingTool({ name, slug, stringLen, accent }) {
   const controls = useAnimationControls();
 
   const swing = () =>
@@ -54,8 +61,8 @@ function HangingTool({ name, slug, stringLen }) {
 
   return (
     <div className="flex flex-col items-center">
-      {/* brass nail head */}
-      <div className="relative z-10 h-[7px] w-[7px] rounded-full bg-gradient-to-br from-[#E8CFA0] to-[#8A6A3B] shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
+      {/* connector dot — cream at low opacity */}
+      <div className="relative z-10 h-[7px] w-[7px] rounded-full bg-[#F0E6D2]/60 shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
 
       <motion.div
         className="flex flex-col items-center"
@@ -63,18 +70,21 @@ function HangingTool({ name, slug, stringLen }) {
         animate={controls}
         onMouseEnter={swing}
       >
-        {/* cord */}
+        {/* cord — cream at low opacity */}
         <div
-          className="w-px bg-gradient-to-b from-white/30 to-white/10"
+          className="w-px bg-gradient-to-b from-[#F0E6D2]/40 to-[#F0E6D2]/15"
           style={{ height: stringLen }}
         />
 
-        {/* matte tile holding the icon */}
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#241609] ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_10px_18px_rgba(0,0,0,0.55)] md:h-14 md:w-14">
+        {/* accent chip holding the icon */}
+        <div
+          className="flex h-12 w-12 items-center justify-center rounded-xl ring-1 ring-[#F0E6D2]/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_18px_rgba(0,0,0,0.55)] md:h-14 md:w-14"
+          style={{ backgroundColor: accent }}
+        >
           <ToolIcon name={name} slug={slug} />
         </div>
 
-        <span className="mt-2 text-[9px] font-semibold uppercase tracking-[0.15em] text-cream/45 md:text-[10px]">
+        <span className="mt-2 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#A89680] md:text-[10px]">
           {name}
         </span>
       </motion.div>
@@ -104,7 +114,7 @@ export default function Toolbox() {
   const stringLens = [10, 18, 13, 21, 15];
 
   return (
-    <section id="toolbox" className="relative flex h-screen flex-col overflow-hidden bg-bark text-cream">
+    <section id="toolbox" className="relative flex h-screen flex-col overflow-hidden bg-[#1A1410] text-[#F0E6D2]">
       {/* transition in: the cream shelf tears down into the espresso */}
       <svg
         viewBox="0 0 1440 70"
@@ -136,17 +146,17 @@ export default function Toolbox() {
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
         >
-          <h2 className="text-2xl font-bold tracking-tight text-cream md:text-4xl">
+          <h2 className="text-2xl font-bold tracking-tight text-[#F0E6D2] md:text-4xl">
             Tools Behind Every Chapter
           </h2>
-          <p className="mx-auto mt-2 max-w-lg text-xs text-cream/55 md:text-sm">
+          <p className="mx-auto mt-2 max-w-lg text-xs text-[#A89680] md:text-sm">
             The technologies that bring these ideas to life.
           </p>
         </motion.header>
 
         {/* walnut rack panel */}
         <motion.div
-          className="relative mx-auto w-full max-w-4xl shrink-0 rounded-2xl bg-gradient-to-b from-barklight to-[#1F1207] px-4 py-5 ring-1 ring-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] md:px-10 md:py-7"
+          className="relative mx-auto w-full max-w-4xl shrink-0 rounded-2xl bg-[#241C16] px-4 py-5 ring-1 ring-[#F0E6D2]/20 shadow-[0_30px_60px_rgba(0,0,0,0.6)] md:px-10 md:py-7"
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
@@ -158,7 +168,7 @@ export default function Toolbox() {
             className="pointer-events-none absolute inset-0 rounded-2xl opacity-30 [background:repeating-linear-gradient(93deg,transparent_0,transparent_18px,rgba(0,0,0,0.28)_18px,rgba(0,0,0,0.28)_19px)]"
           />
           {/* inner bevel */}
-          <span className="pointer-events-none absolute inset-2 rounded-xl border border-white/5" />
+          <span className="pointer-events-none absolute inset-2 rounded-xl border border-[#F0E6D2]/10" />
           <Screw className="left-3 top-3" />
           <Screw className="right-3 top-3" />
           <Screw className="bottom-3 left-3" />
@@ -171,6 +181,7 @@ export default function Toolbox() {
                 name={t.name}
                 slug={t.slug}
                 stringLen={stringLens[i % stringLens.length]}
+                accent={ACCENTS[i % ACCENTS.length]}
               />
             ))}
           </div>

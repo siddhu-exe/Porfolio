@@ -53,9 +53,8 @@ export default function Statement() {
     <section className="relative">
       {/* stepped podium silhouette rising over the hero */}
       <div aria-hidden className="flex flex-col items-center">
-        <div className="h-5 w-[36%] bg-ink md:h-8" />
-        <div className="h-5 w-[58%] bg-ink md:h-8" />
-        <div className="h-5 w-[80%] bg-ink md:h-8" />
+        <div className="h-12 w-[30%] bg-ink md:h-20" />
+        <div className="h-12 w-[60%] bg-ink md:h-20" />
       </div>
 
       <div className="relative bg-ink text-cream">

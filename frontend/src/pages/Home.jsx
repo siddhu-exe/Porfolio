@@ -15,6 +15,7 @@ export default function Home() {
   const [projects, setProjects] = useState([]);
   const [contactOpen, setContactOpen] = useState(false);
   const statementRef = useRef(null);
+  const contactRef = useRef(null);
 
   useEffect(() => {
     fetchProjects()
@@ -35,6 +36,20 @@ export default function Home() {
     y: useTransform(scrollYProgress, [0.12, 1], ['0vh', '45vh']),
     opacity: useTransform(scrollYProgress, [0.12, 0.9], [1, 0]),
     scale: useTransform(scrollYProgress, [0.12, 1], [1, 0.93]),
+  };
+
+  // Final transition: as the reveal window (#contact) scrolls up and uncovers
+  // the footer, the footer's content RISES from bottom to top and fades in —
+  // so the footer animates as part of the transition (juanmora.co style) rather
+  // than sitting there static.
+  const { scrollYProgress: revealProgress } = useScroll({
+    target: contactRef,
+    offset: ['start end', 'start start'],
+  });
+
+  const footerRise = {
+    y: useTransform(revealProgress, [0.05, 1], ['60vh', '0vh']),
+    opacity: useTransform(revealProgress, [0.1, 0.7], [0, 1]),
   };
 
   return (
@@ -66,20 +81,12 @@ export default function Home() {
             { node: <ReadingCorner />, dwellVh: 70 },
           ]}
         />
-
-        {/* Stage transition #2, mirrored: the page's bottom edge is the podium
-            in reverse — the black Reading Corner lifts away step by step,
-            revealing the yellow footer beneath. */}
-        <div aria-hidden className="relative z-30 flex flex-col items-center">
-          <div className="h-5 w-[80%] bg-black md:h-8" />
-          <div className="h-5 w-[58%] bg-black md:h-8" />
-          <div className="h-5 w-[36%] bg-black md:h-8" />
-        </div>
       </main>
 
-      {/* Reveal window for the fixed footer underneath */}
-      <div id="contact" className="relative h-screen" />
-      <Footer onReachOut={() => setContactOpen(true)} />
+      {/* Reveal window for the fixed footer underneath — also the scroll
+          driver for the footer's rise-in animation. */}
+      <div ref={contactRef} id="contact" className="relative h-screen" />
+      <Footer riseStyle={footerRise} onReachOut={() => setContactOpen(true)} />
 
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
     </>
