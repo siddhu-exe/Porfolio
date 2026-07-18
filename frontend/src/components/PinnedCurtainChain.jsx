@@ -88,6 +88,9 @@ export default function PinnedCurtainChain({ sections }) {
         // Push the trigger later (further down the scroll) for a given
         // transition. Positive = you scroll more before the curtain begins.
         const startOffsetVh = sections[i + 1].startOffsetVh || 0;
+        // mode 'scale' = scale-through: outgoing section recedes (scale down,
+        // dim, blur) while the incoming one settles forward from oversized.
+        const mode = sections[i + 1].mode || 'slide';
 
         gsap.set(curtainEl, { yPercent: 100 });
 
@@ -108,6 +111,37 @@ export default function PinnedCurtainChain({ sections }) {
           },
         });
         tl.to(curtainEl, { yPercent: 0, ease: 'none', duration: revealFraction }, 0);
+        if (mode === 'scale') {
+          // Animate the inner content nodes, never baseEl — it's pinned and
+          // ScrollTrigger owns its transform.
+          const outgoing = measureRefs.current[i];
+          const incoming = measureRefs.current[i + 1];
+          // Paint the stage black so the receding section shrinks into
+          // darkness instead of exposing the transparent stage (and the
+          // fixed yellow footer behind the page).
+          gsap.set(baseEl, { backgroundColor: '#000' });
+          if (outgoing) {
+            tl.to(
+              outgoing,
+              {
+                scale: 0.9,
+                opacity: 0.45,
+                filter: 'blur(5px)',
+                ease: 'power1.inOut',
+                duration: revealFraction,
+              },
+              0
+            );
+          }
+          if (incoming) {
+            tl.fromTo(
+              incoming,
+              { scale: 1.08 },
+              { scale: 1, ease: 'power2.out', duration: revealFraction },
+              0
+            );
+          }
+        }
         if (dwellVh > 0) {
           tl.to(curtainEl, { yPercent: 0, duration: 1 - revealFraction }, revealFraction);
         }
@@ -117,6 +151,9 @@ export default function PinnedCurtainChain({ sections }) {
       return () => {
         triggers.forEach((st) => st?.kill());
         curtainRefs.current.forEach((el) => el && gsap.set(el, { yPercent: 0 }));
+        measureRefs.current.forEach(
+          (el) => el && gsap.set(el, { clearProps: 'transform,opacity,filter' })
+        );
       };
     });
 
