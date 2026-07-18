@@ -85,8 +85,11 @@ export default function PinnedCurtainChain({ sections }) {
         const baseEl = stageRefs.current[i];
         const curtainEl = curtainRefs.current[i + 1];
         const dwellVh = sections[i + 1].dwellVh || 0;
-        // Push the trigger later (further down the scroll) for a given
-        // transition. Positive = you scroll more before the curtain begins.
+        // Delay before the curtain starts rising, spent pinned on the base
+        // section. Implemented INSIDE the timeline (not by moving the trigger
+        // start) — delaying the pin start itself leaves the next stage's empty
+        // band visible below the base section (a transparent gap) while the
+        // curtain hasn't engaged yet.
         const startOffsetVh = sections[i + 1].startOffsetVh || 0;
         // mode 'scale' = scale-through: outgoing section recedes (scale down,
         // dim, blur) while the incoming one settles forward from oversized.
@@ -95,13 +98,14 @@ export default function PinnedCurtainChain({ sections }) {
         gsap.set(curtainEl, { yPercent: 100 });
 
         const revealVh = 100;
-        const totalVh = revealVh + dwellVh;
+        const totalVh = startOffsetVh + revealVh + dwellVh;
+        const delayFraction = startOffsetVh / totalVh;
         const revealFraction = revealVh / totalVh;
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: baseEl,
-            start: `bottom bottom-=${startOffsetVh}%`,
+            start: 'bottom bottom',
             end: `+=${totalVh}%`,
             pin: baseEl,
             pinSpacing: true,
@@ -110,7 +114,11 @@ export default function PinnedCurtainChain({ sections }) {
             invalidateOnRefresh: true,
           },
         });
-        tl.to(curtainEl, { yPercent: 0, ease: 'none', duration: revealFraction }, 0);
+        if (delayFraction > 0) {
+          // hold: pinned on the base section before the curtain engages
+          tl.to(curtainEl, { yPercent: 100, duration: delayFraction }, 0);
+        }
+        tl.to(curtainEl, { yPercent: 0, ease: 'none', duration: revealFraction }, delayFraction);
         if (mode === 'scale') {
           // Animate the inner content nodes, never baseEl — it's pinned and
           // ScrollTrigger owns its transform.
@@ -130,7 +138,7 @@ export default function PinnedCurtainChain({ sections }) {
                 ease: 'power1.inOut',
                 duration: revealFraction,
               },
-              0
+              delayFraction
             );
           }
           if (incoming) {
@@ -138,12 +146,16 @@ export default function PinnedCurtainChain({ sections }) {
               incoming,
               { scale: 1.08 },
               { scale: 1, ease: 'power2.out', duration: revealFraction },
-              0
+              delayFraction
             );
           }
         }
         if (dwellVh > 0) {
-          tl.to(curtainEl, { yPercent: 0, duration: 1 - revealFraction }, revealFraction);
+          tl.to(
+            curtainEl,
+            { yPercent: 0, duration: 1 - delayFraction - revealFraction },
+            delayFraction + revealFraction
+          );
         }
         triggers.push(tl.scrollTrigger);
       }

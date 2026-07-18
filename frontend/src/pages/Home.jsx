@@ -77,8 +77,8 @@ export default function Home() {
         <PinnedCurtainChain
           sections={[
             { node: <ProjectShelf projects={projects} /> },
-            { node: <Toolbox />, startOffsetVh: 30 },
-            { node: <ReadingCorner />, dwellVh: 70 },
+            { node: <Toolbox /> },
+            { node: <ReadingCorner />, dwellVh: 70, mode: 'scale' },
           ]}
         />
       </main>

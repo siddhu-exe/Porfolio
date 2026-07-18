@@ -132,7 +132,7 @@ const fadeUp = {
 
 export default function ReadingCorner() {
   return (
-    <section id="reading" className="relative overflow-hidden bg-black text-cream">
+    <section id="reading" className="grain relative overflow-hidden bg-black text-cream">
       {/* The Toolbox → Reading Corner seam is drawn by <ScrollMorphEdge> in
           Home.jsx (a velocity-reactive morphing curve), so there is no static
           edge here. Top padding below leaves room for that overlay. */}
@@ -151,6 +151,9 @@ export default function ReadingCorner() {
           whileInView="show"
           viewport={{ once: true, margin: '-80px' }}
         >
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-terracotta md:text-sm">
+            03 &mdash; The Reading Corner
+          </p>
           <h2 className="text-4xl font-bold tracking-tight text-cream md:text-6xl">Reading Corner</h2>
           <svg viewBox="0 0 220 12" className="mx-auto mt-4 w-40 text-terracotta">
             <path d="M2 8 C 30 2, 50 10, 80 6 S 140 2, 218 6" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />

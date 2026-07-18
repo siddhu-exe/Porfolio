@@ -114,7 +114,7 @@ export default function Toolbox() {
   const stringLens = [10, 18, 13, 21, 15];
 
   return (
-    <section id="toolbox" className="relative flex h-screen flex-col overflow-hidden bg-[#1A1410] text-[#F0E6D2]">
+    <section id="toolbox" className="grain relative flex h-screen flex-col overflow-hidden bg-[#1A1410] text-[#F0E6D2]">
       {/* transition in: the cream shelf tears down into the espresso */}
       <svg
         viewBox="0 0 1440 70"
@@ -146,6 +146,9 @@ export default function Toolbox() {
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
         >
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#E85D2C] md:text-sm">
+            02 &mdash; The Workshop
+          </p>
           <h2 className="text-2xl font-bold tracking-tight text-[#F0E6D2] md:text-4xl">
             Tools Behind Every Chapter
           </h2>

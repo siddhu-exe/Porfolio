@@ -57,7 +57,7 @@ export default function Statement() {
         <div className="h-12 w-[60%] bg-ink md:h-20" />
       </div>
 
-      <div className="relative bg-ink text-cream">
+      <div className="grain relative bg-ink text-cream">
         {/* tall track — its length is how long the statement stays pinned */}
         <div ref={trackRef} className="relative h-[300vh]">
           <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-8 md:px-16">
