@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 import Signature from './Signature.jsx';
 import MaskedRevealText from './MaskedRevealText.jsx';
 
@@ -17,6 +17,10 @@ const SOCIALS = [
  */
 export default function Footer({ onReachOut, riseStyle }) {
   const [time, setTime] = useState('');
+  // Draw the signature only when the name block scrolls into view, so the
+  // stroke animation plays as the footer is revealed (not invisibly on load).
+  const sigRef = useRef(null);
+  const sigInView = useInView(sigRef, { once: true, margin: '-10%' });
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat('en-IN', {
@@ -56,15 +60,16 @@ export default function Footer({ onReachOut, riseStyle }) {
               dongardivedeepak17@gmail.com
             </a>
           </div>
+
         {/* ghost name with the signature floating over it — masked line reveal */}
-        <div className="relative flex min-h-0 flex-1 items-center justify-center">
+        <div ref={sigRef} className="relative flex min-h-0 flex-1 items-center justify-center">
           <MaskedRevealText
             as="h2"
             lines={['SIDDHARTH', 'DONGARDIVE']}
             className="font-display select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]"
             lineClassName="text-[11vw]"
           />
-          <Signature className="absolute w-[200px] md:w-[300px]" />
+          <Signature play={sigInView} className="absolute w-[200px] md:w-[300px]" />
         </div>
       </div>
 
@@ -84,11 +89,26 @@ export default function Footer({ onReachOut, riseStyle }) {
             />
           </div>
 
+          {/* big CTA — the footer's primary call to action, centered */}
+          <a
+            href="mailto:dongardivedeepak17@gmail.com"
+            className="group inline-flex flex-wrap items-baseline gap-x-3 md:justify-center"
+          >
+            <span className="font-display text-4xl font-bold leading-[0.95] tracking-headline text-ink md:text-5xl">
+              Let&rsquo;s build
+            </span>
+            <span className="font-display text-4xl font-bold italic leading-[0.95] tracking-headline text-ink/40 transition-colors duration-300 group-hover:text-ink md:text-5xl">
+              something&nbsp;&rarr;
+            </span>
+          </a>
+
           <div className="flex flex-col items-start gap-3 md:items-end">
             <span className="text-sm text-ink/60">Reach out</span>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://www.instagram.com/siddharth_20_d/"
+                target="_blank"
+                rel="noreferrer"
                 aria-label="Instagram"
                 className="flex h-11 w-11 items-center justify-center rounded-xl border border-ink/30 text-ink transition-colors hover:bg-ink hover:text-cream"
               >
@@ -99,7 +119,9 @@ export default function Footer({ onReachOut, riseStyle }) {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/siddharth-dongardive-906a79251"
+                target="_blank"
+                rel="noreferrer"
                 aria-label="LinkedIn"
                 className="flex h-11 w-11 items-center justify-center rounded-xl border border-ink/30 text-ink transition-colors hover:bg-ink hover:text-cream"
               >

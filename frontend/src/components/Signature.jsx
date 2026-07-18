@@ -1,16 +1,18 @@
 import { motion } from 'framer-motion';
 
-const draw = (duration, delay) => ({
+const draw = (duration, delay, play) => ({
   initial: { pathLength: 0 },
-  animate: { pathLength: 1 },
+  animate: play ? { pathLength: 1 } : { pathLength: 0 },
   transition: { duration, delay, ease: 'easeInOut' },
 });
 
 /**
- * Hand-drawn cursive "Siddharth" signature. The strokes draw themselves in
- * via pathLength (stroke-dasharray/offset under the hood in Framer Motion).
+ * Hand-drawn cursive "Siddharth" signature. The strokes draw themselves in via
+ * pathLength (stroke-dasharray/offset under the hood in Framer Motion) — but
+ * only once `play` is true, so the draw-on plays as the footer is revealed
+ * rather than firing invisibly on page load.
  */
-export default function Signature({ className }) {
+export default function Signature({ className, play = true }) {
   return (
     <svg
       viewBox="0 0 560 220"
@@ -58,7 +60,7 @@ export default function Signature({ className }) {
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        {...draw(1.9, 0.1)}
+        {...draw(1.9, 0.1, play)}
       />
       {/* t crossbar */}
       <motion.path
@@ -66,7 +68,7 @@ export default function Signature({ className }) {
         stroke="var(--terracotta)"
         strokeWidth="5"
         strokeLinecap="round"
-        {...draw(0.25, 2.0)}
+        {...draw(0.25, 2.0, play)}
       />
       {/* i dot */}
       <motion.path
@@ -74,7 +76,7 @@ export default function Signature({ className }) {
         stroke="var(--terracotta)"
         strokeWidth="6"
         strokeLinecap="round"
-        {...draw(0.12, 2.25)}
+        {...draw(0.12, 2.25, play)}
       />
     </svg>
   );
