@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { scrollToSection } from './SmoothScroll.jsx';
 
 const ITEMS = [
   { label: 'Home', target: 'top' },
@@ -21,11 +22,10 @@ export default function MenuPill() {
 
   const go = (target) => {
     setOpen(false);
-    if (target === 'top') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Route through Lenis (when active) for an eased premium glide that stays
+    // in sync with the pinned GSAP sections — native scrollIntoView fights
+    // normalizeScroll and lands with a jolt.
+    scrollToSection(target);
   };
 
   return (

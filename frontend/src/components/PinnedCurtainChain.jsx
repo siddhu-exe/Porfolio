@@ -85,6 +85,9 @@ export default function PinnedCurtainChain({ sections }) {
         const baseEl = stageRefs.current[i];
         const curtainEl = curtainRefs.current[i + 1];
         const dwellVh = sections[i + 1].dwellVh || 0;
+        // Push the trigger later (further down the scroll) for a given
+        // transition. Positive = you scroll more before the curtain begins.
+        const startOffsetVh = sections[i + 1].startOffsetVh || 0;
 
         gsap.set(curtainEl, { yPercent: 100 });
 
@@ -95,7 +98,7 @@ export default function PinnedCurtainChain({ sections }) {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: baseEl,
-            start: 'bottom bottom',
+            start: `bottom bottom-=${startOffsetVh}%`,
             end: `+=${totalVh}%`,
             pin: baseEl,
             pinSpacing: true,

@@ -72,16 +72,16 @@ export default function Footer({ onReachOut, riseStyle }) {
       <div className="relative border-t border-ink/15 bg-cream px-8 py-7 md:px-16 md:py-9">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h3 className="text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl">
-              LIBRARY
-              <br />
-              CLOSED
-            </h3>
-            <p className="mt-4 text-sm text-ink/70 md:text-base">
-              Until the next project.
-              <br />
-             
-            </p>
+            <MaskedRevealText
+              as="h3"
+              lines={['LIBRARY', 'CLOSED']}
+              className="text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl"
+            />
+            <MaskedRevealText
+              as="p"
+              lines={['Until the next project.']}
+              className="mt-4 text-sm text-ink/70 md:text-base"
+            />
           </div>
 
           <div className="flex flex-col items-start gap-3 md:items-end">

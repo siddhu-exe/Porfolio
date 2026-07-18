@@ -5,6 +5,32 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Active Lenis instance (null on touch devices / reduced motion, where native
+// scroll is used instead). Nav clicks route through scrollToSection below so
+// they glide through Lenis's pipeline instead of fighting it with native
+// scrollIntoView (normalizeScroll intercepts native smooth scrolling).
+let lenisInstance = null;
+
+/**
+ * Smoothly scroll to a section id (or 'top'). Uses Lenis when active — with a
+ * long eased glide so pinned sections scrub through premium-slow — and falls
+ * back to native smooth scroll otherwise.
+ */
+export function scrollToSection(target) {
+  const dest = target === 'top' ? 0 : document.getElementById(target);
+  if (dest !== 0 && !dest) return;
+  if (lenisInstance) {
+    lenisInstance.scrollTo(dest, {
+      duration: 1.6,
+      easing: (t) => 1 - Math.pow(1 - t, 4), // easeOutQuart glide
+    });
+  } else if (dest === 0) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    dest.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
 /**
  * Site-wide smooth scroll (Lenis), kept on the same frame clock as GSAP so it
  * never fights ScrollTrigger's pinned curtain transition:
@@ -38,6 +64,7 @@ export default function SmoothScroll() {
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
     });
+    lenisInstance = lenis;
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -56,6 +83,7 @@ export default function SmoothScroll() {
       ScrollTrigger.removeEventListener('refresh', onRefresh);
       gsap.ticker.remove(tick);
       lenis.destroy();
+      lenisInstance = null;
     };
   }, []);
 
