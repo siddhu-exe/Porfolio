@@ -104,7 +104,7 @@ export default function Hero({ sinkStyle }) {
 
             
 
-            <h1 className="text-center font-bold leading-[0.95] tracking-tight text-ink">
+            <h1 className="font-display text-center font-bold leading-[0.95] tracking-tight text-ink">
               <motion.span
                 variants={riseIn}
                 className="block text-[12vw] md:text-[8.5vw] lg:text-[7vw]"

@@ -61,7 +61,7 @@ export default function Footer({ onReachOut, riseStyle }) {
           <MaskedRevealText
             as="h2"
             lines={['SIDDHARTH', 'DONGARDIVE']}
-            className="select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]"
+            className="font-display select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]"
             lineClassName="text-[11vw]"
           />
           <Signature className="absolute w-[200px] md:w-[300px]" />
@@ -75,7 +75,7 @@ export default function Footer({ onReachOut, riseStyle }) {
             <MaskedRevealText
               as="h3"
               lines={['LIBRARY', 'CLOSED']}
-              className="text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl"
+              className="font-display text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl"
             />
             <MaskedRevealText
               as="p"

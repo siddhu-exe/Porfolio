@@ -154,7 +154,7 @@ export default function ReadingCorner() {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-terracotta md:text-sm">
             03 &mdash; The Reading Corner
           </p>
-          <h2 className="text-4xl font-bold tracking-tight text-cream md:text-6xl">Reading Corner</h2>
+          <h2 className="font-display text-4xl font-bold tracking-tight text-cream md:text-6xl">Reading Corner</h2>
           <svg viewBox="0 0 220 12" className="mx-auto mt-4 w-40 text-terracotta">
             <path d="M2 8 C 30 2, 50 10, 80 6 S 140 2, 218 6" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
           </svg>

@@ -16,6 +16,7 @@ export default {
       },
       fontFamily: {
         sans: ['"General Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       letterSpacing: {
         headline: '-0.03em',

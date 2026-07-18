@@ -149,7 +149,7 @@ export default function Toolbox() {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#E85D2C] md:text-sm">
             02 &mdash; The Workshop
           </p>
-          <h2 className="text-2xl font-bold tracking-tight text-[#F0E6D2] md:text-4xl">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-[#F0E6D2] md:text-4xl">
             Tools Behind Every Chapter
           </h2>
           <p className="mx-auto mt-2 max-w-lg text-xs text-[#A89680] md:text-sm">
