@@ -21,6 +21,8 @@ export default function Footer({ onReachOut, riseStyle }) {
   // stroke animation plays as the footer is revealed (not invisibly on load).
   const sigRef = useRef(null);
   const sigInView = useInView(sigRef, { once: true, margin: '-10%' });
+  const creamRef = useRef(null);
+  const creamInView = useInView(creamRef, { once: true, margin: '-10%' });
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat('en-IN', {
@@ -65,6 +67,7 @@ export default function Footer({ onReachOut, riseStyle }) {
         <div ref={sigRef} className="relative flex min-h-0 flex-1 items-center justify-center">
           <MaskedRevealText
             as="h2"
+            inView={sigInView}
             lines={['SIDDHARTH', 'DONGARDIVE']}
             className="font-display select-none text-center font-bold leading-[0.95] tracking-headline text-[#E0C336]"
             lineClassName="text-[11vw]"
@@ -74,16 +77,20 @@ export default function Footer({ onReachOut, riseStyle }) {
       </div>
 
       {/* cream strip */}
-      <div className="relative border-t border-ink/15 bg-cream px-8 py-7 md:px-16 md:py-9">
+      <div ref={creamRef} className="relative border-t border-ink/15 bg-cream px-8 py-7 md:px-16 md:py-9">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <MaskedRevealText
               as="h3"
+              inView={creamInView}
               lines={['LIBRARY', 'CLOSED']}
+              line
+              lineColor="bg-ink/20"
               className="font-display text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl"
             />
             <MaskedRevealText
               as="p"
+              inView={creamInView}
               lines={['Until the next project.']}
               className="mt-4 text-sm text-ink/70 md:text-base"
             />

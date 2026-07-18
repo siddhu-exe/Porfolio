@@ -61,7 +61,9 @@
       "Bash(python3 scripts/search.py --help)",
       "Bash(python3 scripts/search.py \"portfolio footer design editorial premium\" --domain ux --max-results 5)",
       "Bash(python3 scripts/search.py \"footer contact section landing\" --domain landing --max-results 4)",
-      "Bash(python3 scripts/search.py \"editorial serif display headline pairing sans body\" --domain typography --max-results 5)"
+      "Bash(python3 scripts/search.py \"editorial serif display headline pairing sans body\" --domain typography --max-results 5)",
+      "Bash(python3 scripts/search.py \"text reveal mask line rise scroll stagger premium\" --domain gsap --max-results 4)",
+      "Bash(python3 scripts/search.py \"text mask reveal rise line scroll trigger\" --domain ux --max-results 3)"
     ]
   }
 }
