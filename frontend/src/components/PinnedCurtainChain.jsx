@@ -121,7 +121,10 @@ export default function PinnedCurtainChain({ sections }) {
         tl.to(curtainEl, { yPercent: 0, ease: 'none', duration: revealFraction }, delayFraction);
         if (mode === 'scale') {
           // Animate the inner content nodes, never baseEl — it's pinned and
-          // ScrollTrigger owns its transform.
+          // ScrollTrigger owns its transform. Only scale + opacity here: both
+          // are compositor-only (cheap). A `filter: blur()` tween was removed
+          // because animating blur re-rasterizes the whole subtree (15 icon
+          // images) every scroll frame — that was the Toolbox lag.
           const outgoing = measureRefs.current[i];
           const incoming = measureRefs.current[i + 1];
           // Paint the stage black so the receding section shrinks into
@@ -129,12 +132,12 @@ export default function PinnedCurtainChain({ sections }) {
           // fixed yellow footer behind the page).
           gsap.set(baseEl, { backgroundColor: '#000' });
           if (outgoing) {
+            gsap.set(outgoing, { willChange: 'transform, opacity' });
             tl.to(
               outgoing,
               {
-                scale: 0.9,
-                opacity: 0.45,
-                filter: 'blur(5px)',
+                scale: 0.92,
+                opacity: 0.4,
                 ease: 'power1.inOut',
                 duration: revealFraction,
               },
@@ -142,9 +145,10 @@ export default function PinnedCurtainChain({ sections }) {
             );
           }
           if (incoming) {
+            gsap.set(incoming, { willChange: 'transform' });
             tl.fromTo(
               incoming,
-              { scale: 1.08 },
+              { scale: 1.06 },
               { scale: 1, ease: 'power2.out', duration: revealFraction },
               delayFraction
             );
@@ -164,7 +168,7 @@ export default function PinnedCurtainChain({ sections }) {
         triggers.forEach((st) => st?.kill());
         curtainRefs.current.forEach((el) => el && gsap.set(el, { yPercent: 0 }));
         measureRefs.current.forEach(
-          (el) => el && gsap.set(el, { clearProps: 'transform,opacity,filter' })
+          (el) => el && gsap.set(el, { clearProps: 'transform,opacity,filter,willChange' })
         );
       };
     });

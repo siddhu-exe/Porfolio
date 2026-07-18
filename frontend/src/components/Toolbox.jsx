@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
+import MaskedRevealText from './MaskedRevealText.jsx';
 
 // name -> simpleicons slug (rendered in original brand colors via CDN).
 // null slug falls back to an initials tile (e.g. XGBoost has no brand icon).
@@ -42,7 +43,8 @@ function ToolIcon({ name, slug }) {
       src={`https://cdn.simpleicons.org/${slug}/${CREAM}`}
       alt={name}
       className="h-5 w-5 md:h-6 md:w-6"
-      loading="lazy"
+      loading="eager"
+      decoding="async"
       draggable={false}
       onError={() => setFailed(true)}
     />
@@ -149,9 +151,13 @@ export default function Toolbox() {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#E85D2C] md:text-sm">
             02 &mdash; The Workshop
           </p>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-[#F0E6D2] md:text-4xl">
-            Tools Behind Every Chapter
-          </h2>
+          <MaskedRevealText
+            as="h2"
+            lines={['Tools Behind', 'Every Chapter']}
+            line
+            lineColor="bg-[#E85D2C]/40"
+            className="font-display text-2xl font-bold tracking-tight text-[#F0E6D2] md:text-4xl"
+          />
           <p className="mx-auto mt-2 max-w-lg text-xs text-[#A89680] md:text-sm">
             The technologies that bring these ideas to life.
           </p>
