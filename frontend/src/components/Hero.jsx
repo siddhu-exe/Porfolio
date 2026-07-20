@@ -177,7 +177,7 @@ export default function Hero({ sinkStyle, onIntroComplete }) {
               </p>
             </div>
 
-            <div ref={menuRef} className="mt-10 md:mt-12">
+            <div ref={menuRef} className="mt-14 md:mt-16">
               <MenuPill />
             </div>
           </div>
