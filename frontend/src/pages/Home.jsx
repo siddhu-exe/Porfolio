@@ -55,6 +55,24 @@ export default function Home() {
     opacity: useTransform(revealProgress, [0.1, 0.7], [0, 1]),
   };
 
+  // Keep the footer reveal reading as a growing card through all three
+  // stages. The lower corners only resolve to the viewport edges at the very
+  // end of the existing one-screen handoff.
+  const footerPanel = {
+    clipPath: useTransform(
+      revealProgress,
+      [0, 0.08, 0.34, 0.72, 0.98, 1],
+      [
+        'inset(0% 7% 100% 7% round 0px 0px 48px 48px)',
+        'inset(0% 7% 92% 7% round 0px 0px 48px 48px)',
+        'inset(0% 5% 62% 5% round 0px 0px 48px 48px)',
+        'inset(0% 2.5% 22% 2.5% round 0px 0px 40px 40px)',
+        'inset(0% 0% 0% 0% round 0px 0px 32px 32px)',
+        'inset(0% 0% 0% 0% round 0px)',
+      ],
+    ),
+  };
+
   return (
     <>
       {/* Opaque page content, above the fixed footer. No background of its
@@ -88,8 +106,12 @@ export default function Home() {
 
       {/* Reveal window for the fixed footer underneath — also the scroll
           driver for the footer's rise-in animation. */}
-      <div ref={contactRef} id="contact" className="relative h-screen" />
-      <Footer riseStyle={footerRise} onReachOut={() => setContactOpen(true)} />
+      <div ref={contactRef} id="contact" className="relative h-screen bg-black" />
+      <Footer
+        panelStyle={footerPanel}
+        riseStyle={footerRise}
+        onReachOut={() => setContactOpen(true)}
+      />
 
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
       <BookmarkProgress visible={introComplete} />

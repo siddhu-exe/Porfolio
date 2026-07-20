@@ -15,7 +15,7 @@ const SOCIALS = [
  * — so the footer animates as part of the final transition instead of sitting
  * there static (juanmora.co style).
  */
-export default function Footer({ onReachOut, riseStyle }) {
+export default function Footer({ onReachOut, panelStyle, riseStyle }) {
   const [time, setTime] = useState('');
   // Draw the signature only when the name block scrolls into view, so the
   // stroke animation plays as the footer is revealed (not invisibly on load).
@@ -39,7 +39,10 @@ export default function Footer({ onReachOut, riseStyle }) {
   }, []);
 
   return (
-    <footer className="fixed bottom-0 left-0 z-0 flex h-screen w-full flex-col overflow-hidden bg-mustard">
+    <motion.footer
+      style={panelStyle}
+      className="fixed bottom-0 left-0 z-20 flex h-screen w-full flex-col overflow-hidden bg-mustard will-change-[clip-path]"
+    >
       {/* denser dot grid on yellow */}
       <div
         aria-hidden
@@ -162,6 +165,6 @@ export default function Footer({ onReachOut, riseStyle }) {
         </div>
       </div>
       </motion.div>
-    </footer>
+    </motion.footer>
   );
 }
