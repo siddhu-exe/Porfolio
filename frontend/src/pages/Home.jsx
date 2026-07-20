@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useScroll, useTransform } from 'framer-motion';
 import Hero from '../components/Hero.jsx';
 import Statement from '../components/Statement.jsx';
@@ -8,14 +8,17 @@ import ReadingCorner from '../components/ReadingCorner.jsx';
 import Footer from '../components/Footer.jsx';
 import PinnedCurtainChain from '../components/PinnedCurtainChain.jsx';
 import ContactModal from '../components/ContactModal.jsx';
+import BookmarkProgress from '../components/BookmarkProgress.jsx';
 import { fetchProjects } from '../api.js';
 import { fallbackProjects } from '../data/fallbackProjects.js';
 
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [contactOpen, setContactOpen] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
   const statementRef = useRef(null);
   const contactRef = useRef(null);
+  const handleIntroComplete = useCallback(() => setIntroComplete(true), []);
 
   useEffect(() => {
     fetchProjects()
@@ -62,7 +65,7 @@ export default function Home() {
             while the Statement covers it, then releases. */}
         <div className="relative">
           <div className="dot-grid sticky top-0 z-10 h-screen md:h-[170vh] bg-cream">
-            <Hero sinkStyle={heroSink} />
+            <Hero sinkStyle={heroSink} onIntroComplete={handleIntroComplete} />
           </div>
           <div ref={statementRef} className="relative z-30">
             <Statement />
@@ -89,6 +92,7 @@ export default function Home() {
       <Footer riseStyle={footerRise} onReachOut={() => setContactOpen(true)} />
 
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+      <BookmarkProgress visible={introComplete} />
     </>
   );
 }

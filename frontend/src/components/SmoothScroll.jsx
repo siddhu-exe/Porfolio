@@ -10,6 +10,22 @@ gsap.registerPlugin(ScrollTrigger);
 // they glide through Lenis's pipeline instead of fighting it with native
 // scrollIntoView (normalizeScroll intercepts native smooth scrolling).
 let lenisInstance = null;
+const scrollProgressSubscribers = new Set();
+
+const getNativeProgress = () => {
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  return scrollable > 0 ? Math.min(Math.max(window.scrollY / scrollable, 0), 1) : 0;
+};
+
+const publishScrollProgress = (progress) => {
+  scrollProgressSubscribers.forEach((subscriber) => subscriber(progress));
+};
+
+export function subscribeToScrollProgress(subscriber) {
+  scrollProgressSubscribers.add(subscriber);
+  subscriber(lenisInstance?.progress ?? getNativeProgress());
+  return () => scrollProgressSubscribers.delete(subscriber);
+}
 
 /**
  * Smoothly scroll to a section id (or 'top'). Uses Lenis when active — with a
@@ -55,7 +71,16 @@ export default function SmoothScroll() {
     // Touch devices keep native scroll — Lenis's virtual scroll can feel odd
     // against touch gestures, and ScrollTrigger's pin already has a simpler
     // non-pinned fallback on mobile.
-    if (prefersReducedMotion || !isFinePointer) return;
+    if (prefersReducedMotion || !isFinePointer) {
+      const onNativeScroll = () => publishScrollProgress(getNativeProgress());
+      window.addEventListener('scroll', onNativeScroll, { passive: true });
+      window.addEventListener('resize', onNativeScroll);
+      onNativeScroll();
+      return () => {
+        window.removeEventListener('scroll', onNativeScroll);
+        window.removeEventListener('resize', onNativeScroll);
+      };
+    }
 
     const lenis = new Lenis({
       duration: 1.1,
@@ -66,7 +91,11 @@ export default function SmoothScroll() {
     });
     lenisInstance = lenis;
 
-    lenis.on('scroll', ScrollTrigger.update);
+    const onLenisScroll = (event) => {
+      ScrollTrigger.update();
+      publishScrollProgress(event.progress);
+    };
+    lenis.on('scroll', onLenisScroll);
 
     // Drive Lenis from GSAP's ticker (shared frame clock) instead of its own
     // requestAnimationFrame loop.
@@ -81,6 +110,7 @@ export default function SmoothScroll() {
 
     return () => {
       ScrollTrigger.removeEventListener('refresh', onRefresh);
+      lenis.off('scroll', onLenisScroll);
       gsap.ticker.remove(tick);
       lenis.destroy();
       lenisInstance = null;

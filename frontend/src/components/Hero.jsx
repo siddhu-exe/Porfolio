@@ -22,7 +22,7 @@ gsap.registerPlugin(useGSAP, SplitText);
  * After the intro, a blue "Hey there!" badge follows the cursor over the hero
  * (typed out with a blinking caret), mirroring the reference site.
  */
-export default function Hero({ sinkStyle }) {
+export default function Hero({ sinkStyle, onIntroComplete }) {
   const [phase, setPhase] = useState('intro');
   const [cursorOn, setCursorOn] = useState(false);
   const heroTextRef = useRef(null);
@@ -30,6 +30,7 @@ export default function Hero({ sinkStyle }) {
   const headlineRef = useRef(null);
   const rightLabelRef = useRef(null);
   const menuRef = useRef(null);
+  const introCompleteRef = useRef(false);
 
   useEffect(() => {
     // Signature draw takes ~2.4s; a short beat, then lift.
@@ -52,13 +53,25 @@ export default function Hero({ sinkStyle }) {
 
       if (reduceMotion) {
         gsap.set([...units, menuRef.current], { yPercent: 0, opacity: 1 });
+        if (!introCompleteRef.current) {
+          introCompleteRef.current = true;
+          onIntroComplete?.();
+        }
         return () => splits.forEach((split) => split.revert());
       }
 
       gsap.set(units, { yPercent: 110, opacity: 0 });
       gsap.set(menuRef.current, { y: 24, opacity: 0 });
 
-      const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      const timeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        onComplete: () => {
+          if (!introCompleteRef.current) {
+            introCompleteRef.current = true;
+            onIntroComplete?.();
+          }
+        },
+      });
       timeline
         .to(leftSplit.words, { yPercent: 0, opacity: 1, duration: 0.3, stagger: 0.035 })
         .to(
@@ -78,7 +91,7 @@ export default function Hero({ sinkStyle }) {
         splits.forEach((split) => split.revert());
       };
     },
-    { scope: heroTextRef, dependencies: [phase] },
+    { scope: heroTextRef, dependencies: [phase, onIntroComplete] },
   );
 
   return (
