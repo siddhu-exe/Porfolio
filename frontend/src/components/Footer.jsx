@@ -84,8 +84,6 @@ export default function Footer({ onReachOut, riseStyle }) {
               as="h3"
               inView={creamInView}
               lines={['LIBRARY', 'CLOSED']}
-              line
-              lineColor="bg-ink/20"
               className="font-display text-3xl font-bold leading-[1.02] tracking-headline text-ink md:text-5xl"
             />
             <MaskedRevealText

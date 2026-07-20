@@ -1,0 +1,256 @@
+# PROJECT GUIDE — Read This First (for any LLM / new contributor)
+
+This single file explains the **entire** Siddharth Dongardive portfolio site well
+enough that you can understand it and safely edit it **without reading every
+source file first**. Read this top-to-bottom once, then jump to the section for
+whatever you're changing.
+
+> Companion docs (more detail on specific tasks):
+> - [`ADDING_PROJECTS.md`](ADDING_PROJECTS.md) — add a book (project) or a shelf (category).
+> - [`CHAPTER_PAGE.md`](CHAPTER_PAGE.md) — the per-project detail page & its image galleries.
+
+---
+
+## 1. What this is
+
+A single-page, scroll-driven **portfolio site** themed as a **library**. A
+visitor scrolls through a sequence of full-screen sections joined by cinematic
+scroll transitions, and clicking a "book" opens a project case-study page.
+
+- **Frontend:** React 18 + Vite, Tailwind CSS, Framer Motion + GSAP (ScrollTrigger)
+  for animation, Lenis for smooth scroll, React Router for the 2 routes.
+- **Backend:** FastAPI (Python). Serves project data and accepts the contact form.
+  It is **data-only** — all visuals live in the frontend.
+- **Source of truth for content:** the backend (`backend/data.py`). The frontend
+  fetches it; a bundled fallback keeps the UI working if the API is down.
+
+## 2. Run it
+
+```bash
+# backend (terminal 1) — from repo root
+cd backend
+uvicorn main:app --reload --port 8000        # NOTE: main:app, NOT app.main:app
+
+# frontend (terminal 2)
+cd frontend
+npm install
+npm run dev                                   # http://localhost:5173
+```
+
+Vite proxies `/api/*` → `http://localhost:8000` in dev (see `frontend/vite.config.js`),
+so no CORS setup is needed locally. To point at a deployed API, set `VITE_API_BASE`.
+`npm run build` produces the production bundle; there are no unit tests — verify
+changes by running the app and scrolling through.
+
+## 3. Repo layout
+
+```
+Portfolio/
+├── README.md
+├── docs/
+│   ├── PROJECT_GUIDE.md      ← you are here (architecture overview)
+│   ├── ADDING_PROJECTS.md    ← add/edit books & shelves
+│   └── CHAPTER_PAGE.md       ← the /projects/:slug page & galleries
+├── backend/
+│   ├── main.py               ← FastAPI app: 3 GET + 1 POST endpoint, CORS
+│   ├── data.py               ← THE content source of truth (projects, shelves, galleries)
+│   ├── requirements.txt
+│   └── contact_messages.jsonl← contact submissions get appended here (stub)
+└── frontend/
+    ├── tailwind.config.js    ← design tokens (colors, fonts, tracking)
+    ├── vite.config.js        ← dev server + /api proxy
+    └── src/
+        ├── main.jsx          ← React entry (mounts <App/> in <BrowserRouter>)
+        ├── App.jsx           ← providers + the 2 routes
+        ├── index.css         ← Tailwind layers + a few global utility classes
+        ├── api.js            ← fetchProjects / fetchProject / sendContact
+        ├── data/fallbackProjects.js ← offline mirror of backend project data
+        ├── pages/
+        │   ├── Home.jsx      ← the scroll-through single page (composition root)
+        │   └── ProjectDetail.jsx ← /projects/:slug case-study page
+        └── components/       ← one component per section / effect (see §6)
+```
+
+## 4. Design tokens (Tailwind) — use these, don't hardcode hex
+
+Defined in `frontend/tailwind.config.js`:
+
+| Token | Value | Meaning |
+|-------|-------|---------|
+| `cream` | `#F7F1ED` | primary background |
+| `ink` | `#171717` | primary text / dark sections |
+| `terracotta` | `#D9834A` | accent (signature, small marks) |
+| `mustard` | `#FFE862` | footer / yellow sections |
+| `bark` / `barklight` / `wood` / `tan` | browns | Toolbox section only |
+| font `sans` | General Sans / Inter | body & UI (default) |
+| font `display` | Playfair Display / Georgia | big display headings (`font-display`) |
+| tracking `headline` | `-0.03em` | tight tracking for large headings (`tracking-headline`) |
+
+Global helpers in `src/index.css`: `.dot-grid` (the dotted background texture),
+`.tw-cursor` (blinking typewriter caret), `.book-title` (vertical text for book
+spines), `.scrollbar-none`. Site-wide horizontal padding convention is
+`px-8 md:px-16` — this aligns content to the fixed vertical frame lines (see §7).
+
+## 5. The page as a scroll sequence (READ THIS before touching Home.jsx)
+
+`pages/Home.jsx` is the composition root. The visitor scrolls through this order:
+
+```
+Hero (cream)                 ← intro, signature draws, name, Menu pill
+  │  transition #1: hero is sticky; Statement's stepped podium rises over it,
+  │                 hero sinks + fades (framer-motion useScroll on statementRef)
+Statement (black)            ← "Every book on this shelf…" pinned word-by-word reveal
+  │  transition #2+#3: PinnedCurtainChain
+ProjectShelf (cream)         ← the bookshelf; click a book → modal → project page
+  │  (curtain)
+Toolbox (dark brown)         ← tools hanging on nails, swing on hover
+  │  (curtain, mode:'scale', dwell)
+ReadingCorner (black)        ← articles as little books
+  │  final transition: #contact reveal window; footer rises + fades in
+Footer (mustard, FIXED)      ← ghost name, LIBRARY CLOSED, links, live IST clock
+```
+
+Key structural facts (do not break these):
+
+- **`<Footer>` is `position: fixed` at `z-0`, behind everything.** `<main>` is
+  `z-10` and opaque, so it covers the footer. The last thing in the DOM before
+  the footer is a `<div id="contact" class="h-screen">` **reveal window** — as
+  it scrolls up, the fixed footer is uncovered. That same `#contact` element is
+  the scroll driver for the footer's rise-in animation (`footerRise` →
+  `riseStyle` prop). If you add a section after ReadingCorner, it goes **inside
+  `<main>`**, before `#contact`.
+- **Transition #1** (Hero→Statement) is Framer Motion: `useScroll` on
+  `statementRef` drives `heroSink` (`y`/`opacity`/`scale`) passed to `<Hero sinkStyle>`.
+- **Transitions #2 & #3** (Shelf→Toolbox→ReadingCorner) are GSAP via
+  `<PinnedCurtainChain>` — see §8.
+- The **Statement** section does its own internal pin (a tall `h-[300vh]` track
+  with a `sticky` inner) — it's self-contained, not part of the chain.
+
+## 6. Component map (what each file is)
+
+**Sections (rendered by Home.jsx, in scroll order):**
+| File | Role |
+|------|------|
+| `Hero.jsx` | Landing: animated signature, typed greeting, big name, Menu pill. |
+| `Statement.jsx` | Black interlude; scroll-pinned word-by-word text reveal + drawn line. |
+| `ProjectShelf.jsx` | The bookshelf. Fetched projects → `BookSpine`s grouped by shelf. Owns `BookModal`. |
+| `Toolbox.jsx` | "Tools Behind Every Chapter" — tech icons hanging on nails. |
+| `ReadingCorner.jsx` | "Reading Corner" — articles rendered as little 3D books. |
+| `Footer.jsx` | Fixed mustard footer: ghost name, CTA, social links, live clock. |
+
+**Transition / motion infrastructure:**
+| File | Role |
+|------|------|
+| `PinnedCurtainChain.jsx` | Chains N sections via N-1 GSAP pin+scrub "curtain" reveals. The core scroll engine. See §8. |
+| `PinnedCurtain.jsx` | Single-pair version (currently Home uses the Chain; keep for reference/reuse). |
+| `SmoothScroll.jsx` | Lenis smooth-scroll, synced to GSAP ticker + ScrollTrigger. Mounted once in App. |
+| `PageTransition.jsx` | `PageTransitionProvider` + `usePageTransition()` — the book-cover wipe between routes. |
+| `ScrollMorphEdge.jsx` | A wavy SVG edge whose curve reacts to scroll velocity (section seams). |
+
+**Reusable pieces / effects:**
+| File | Role |
+|------|------|
+| `BookSpine.jsx` | One book on the shelf (colored spine, vertical title). |
+| `BookModal.jsx` | Opens on book click; "View Full Project" → `usePageTransition` to `/projects/:slug`. |
+| `ImageGallery.jsx` | Chapter-page gallery: 1 img=full, 2=side-by-side, 3+=horizontal scroll. |
+| `ContactModal.jsx` | The contact form; POSTs via `sendContact`. |
+| `MenuPill.jsx` | The hero's expandable nav pill. |
+| `Signature.jsx` | SVG signature with a draw-on animation (`play` prop). |
+| `MaskedRevealText.jsx` | Lines that slide up from a clip mask (`inView` prop). |
+| `Typewriter.jsx` / `CyclingTypewriter.jsx` | Typed text (one-shot / looping). |
+| `CursorBadge.jsx` | Custom cursor label (e.g. "Click" over books). |
+| `EyeFollowButton.jsx` | Button whose "eyes" track the cursor. |
+| `FrameLines.jsx` | The two fixed vertical border lines framing the whole site. |
+
+**Pages:** `Home.jsx` (§5), `ProjectDetail.jsx` (see `CHAPTER_PAGE.md`).
+
+## 7. The vertical frame lines (why content must respect `px-8 md:px-16`)
+
+`FrameLines.jsx` renders two `position: fixed` hairlines at `left-4/right-4`
+(mobile) and `left-10/right-10` (desktop), at `z-[60]`, on **every** route (it's
+in `App.jsx` outside the router). Section content uses `px-8 md:px-16` so it sits
+*inside* those lines. **Do not** wrap a page's content in a narrow centered
+`max-w-*` container at the top level — that visually detaches content from the
+frame. Constrain inner text with `max-w-*` if needed, but let structural
+padding be `px-8 md:px-16`.
+
+## 8. PinnedCurtainChain — the scroll transition engine (edit carefully)
+
+`components/PinnedCurtainChain.jsx` takes `sections={[{ node, ... }]}` and mounts
+each **exactly once**, wiring N-1 GSAP ScrollTrigger transitions between
+consecutive pairs. For pair (i, i+1): section *i* pins when its bottom hits the
+viewport bottom; section *i+1* slides up (`yPercent: 100 → 0`) over ~1 viewport
+of scrubbed scroll, like a curtain rising over the pinned section.
+
+Per-section options (on the object, applies to the transition that reveals it):
+- `dwellVh` (number): extra pinned scroll AFTER the reveal completes, holding the
+  section fully covering the screen (so a fast scroller actually sees it).
+- `startOffsetVh` (number): pinned hold BEFORE the curtain starts rising.
+- `mode: 'scale'`: scale-through — the outgoing section recedes (scale down +
+  dim) while the incoming settles forward from slightly oversized. The stage is
+  painted black during this so no transparent gap shows the fixed footer.
+
+Hard-won invariants (breaking these caused real bugs — don't regress them):
+- Each section is measured (ResizeObserver) and rendered **once**; never render a
+  section twice "for spacing."
+- Each stage's height is independent — never chain a shared `margin-top:-100vh`,
+  it compounds and collapses later sections.
+- Below `md` the pins are skipped entirely (touch pinning is janky) — sections
+  just stack with a light fade-in.
+- Animate inner content nodes for `scale` mode, never the pinned stage element
+  (ScrollTrigger owns its transform). Avoid animating `filter: blur()` on
+  image-heavy sections — it re-rasterizes every frame (caused the Toolbox lag).
+
+Lenis + GSAP are already synced in `SmoothScroll.jsx` (Lenis drives the GSAP
+ticker; ScrollTrigger updates on Lenis scroll). Any new ScrollTrigger you add
+inherits this automatically — don't create a second Lenis instance.
+
+## 9. Backend API
+
+`backend/main.py` — FastAPI, CORS open to the Vite dev origins. Endpoints:
+
+| Method + path | Returns |
+|---|---|
+| `GET /api/projects` | `{ categories, shelves, projects, grouped }` |
+| `GET /api/projects/{slug}` | one full project object, or 404 |
+| `POST /api/contact` | validates `{name, email, message}`, appends to `contact_messages.jsonl`, returns `{ok, message}` |
+| `GET /api/health` | `{status: "ok"}` |
+
+All project content is built in `backend/data.py` (see `ADDING_PROJECTS.md` for
+the exact shape and how to add entries). `frontend/src/data/fallbackProjects.js`
+mirrors it for offline use — keep them roughly in sync.
+
+## 10. How to make common changes (playbook)
+
+- **Add / edit a project or category** → `backend/data.py` (+ mirror in
+  `fallbackProjects.js`). Full steps in `ADDING_PROJECTS.md`. You rarely touch
+  React for this — the shelf and chapter page are data-driven.
+- **Edit the project detail page layout / galleries** → `ProjectDetail.jsx` +
+  `ImageGallery.jsx`; see `CHAPTER_PAGE.md`.
+- **Change a section's look** → edit that section's component in §6. It won't
+  affect the transitions (those live in `PinnedCurtainChain` / Home).
+- **Change / add a scroll transition** → `Home.jsx` (composition) and/or
+  `PinnedCurtainChain.jsx` (engine). Re-read §5 and §8 first; test at both slow
+  and fast scroll speeds and on a narrow (mobile) width.
+- **Add a new full-screen section before the footer** → add its component, then
+  insert it inside `<main>` in `Home.jsx` — either in the `PinnedCurtainChain`
+  `sections` array (to get a curtain transition) or as a plain block. It must be
+  **before** the `#contact` reveal window, never after it.
+- **Change colors / fonts** → `tailwind.config.js` tokens (§4), then use the
+  token classes; don't scatter raw hex codes.
+- **Footer content / links / CTA** → `Footer.jsx`. The footer is fixed and
+  reveal-animated; keep it `position: fixed` and keep the `riseStyle` wrapper.
+
+## 11. Gotchas / non-obvious things
+
+- The **signature draw animation** should play once, when its section enters view
+  (`Signature` takes a `play` prop). Don't trigger it globally on load.
+- The footer being `fixed` behind `<main>` is intentional (§5). If the footer
+  ever "disappears" or shows through a gap mid-page, it's a `z-index` /
+  transparent-stage issue in a transition, not the footer itself.
+- `uvicorn` target is `main:app` (the file is `backend/main.py`), **not**
+  `app.main:app` — there is no `app/` package.
+- No test suite. "Verify" = run the app, scroll the whole page slowly and fast,
+  open a book → its project page, submit the contact form.
+- `.dot-grid` + the `px-8 md:px-16` padding + `FrameLines` together create the
+  framed look; changing one without the others looks broken.

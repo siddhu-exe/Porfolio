@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { SplitText } from 'gsap/SplitText';
 import Signature from './Signature.jsx';
 import MenuPill from './MenuPill.jsx';
 import CursorBadge from './CursorBadge.jsx';
@@ -9,15 +12,7 @@ const CURSOR_PHRASES = ['hey there?', 'Curious?', 'Explore My Library ↓'];
 
 const EASE = [0.76, 0, 0.24, 1];
 
-const heroStagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.14, delayChildren: 0.05 } },
-};
-
-const riseIn = {
-  hidden: { opacity: 0, y: 70 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: EASE } },
-};
+gsap.registerPlugin(useGSAP, SplitText);
 
 /**
  * Intro sequence:
@@ -30,12 +25,61 @@ const riseIn = {
 export default function Hero({ sinkStyle }) {
   const [phase, setPhase] = useState('intro');
   const [cursorOn, setCursorOn] = useState(false);
+  const heroTextRef = useRef(null);
+  const leftLabelRef = useRef(null);
+  const headlineRef = useRef(null);
+  const rightLabelRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     // Signature draw takes ~2.4s; a short beat, then lift.
     const t = setTimeout(() => setPhase((p) => (p === 'intro' ? 'lift' : p)), 3100);
     return () => clearTimeout(t);
   }, []);
+
+  useGSAP(
+    () => {
+      if (phase !== 'hero') return;
+
+      const splits = [
+        SplitText.create(leftLabelRef.current, { type: 'words', wordsClass: 'inline-block' }),
+        SplitText.create(headlineRef.current, { type: 'chars', charsClass: 'inline-block' }),
+        SplitText.create(rightLabelRef.current, { type: 'words', wordsClass: 'inline-block' }),
+      ];
+      const [leftSplit, headlineSplit, rightSplit] = splits;
+      const units = [...leftSplit.words, ...headlineSplit.chars, ...rightSplit.words];
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        gsap.set([...units, menuRef.current], { yPercent: 0, opacity: 1 });
+        return () => splits.forEach((split) => split.revert());
+      }
+
+      gsap.set(units, { yPercent: 110, opacity: 0 });
+      gsap.set(menuRef.current, { y: 24, opacity: 0 });
+
+      const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      timeline
+        .to(leftSplit.words, { yPercent: 0, opacity: 1, duration: 0.3, stagger: 0.035 })
+        .to(
+          headlineSplit.chars,
+          { yPercent: 0, opacity: 1, duration: 0.42, stagger: 0.018 },
+          0.16,
+        )
+        .to(
+          rightSplit.words,
+          { yPercent: 0, opacity: 1, duration: 0.28, stagger: 0.03 },
+          0.76,
+        )
+        .to(menuRef.current, { y: 0, opacity: 1, duration: 0.28 }, 0.82);
+
+      return () => {
+        timeline.kill();
+        splits.forEach((split) => split.revert());
+      };
+    },
+    { scope: heroTextRef, dependencies: [phase] },
+  );
 
   return (
     <section
@@ -88,48 +132,42 @@ export default function Hero({ sinkStyle }) {
 
         {/* Main hero text, staggered bottom-to-top / left-to-right */}
         {phase === 'hero' && (
-          <motion.div
+          <div
+            ref={heroTextRef}
             className="absolute inset-0 flex flex-col justify-center px-8 pt-24 md:px-16"
-            variants={heroStagger}
-            initial="hidden"
-            animate="show"
           >
-            <motion.p
-              variants={riseIn}
-              className="mb-4 text-left text-[0.9rem] font-light uppercase leading-snug tracking-[0.35em] text-ink/70 md:mb-6 md:text-base"
-            >
-              SIDDHARTH 
-              DONGARDIVE
-            </motion.p>
-
-            
-
-            <h1 className="font-display text-center font-bold leading-[0.95] tracking-tight text-ink">
-              <motion.span
-                variants={riseIn}
-                className="block text-[12vw] md:text-[8.5vw] lg:text-[7vw]"
+            <div className="mb-4 overflow-hidden md:mb-6">
+              <p
+                ref={leftLabelRef}
+                className="text-left text-[0.9rem] font-light uppercase leading-snug tracking-[0.35em] text-ink/70 md:text-base"
               >
-                TURNING DATA
-              </motion.span>
-              <motion.span
-                variants={riseIn}
-                className="block text-[12vw] md:text-[8.5vw] lg:text-[7vw]"
+                SIDDHARTH DONGARDIVE
+              </p>
+            </div>
+
+            <div className="overflow-hidden">
+              <h1
+                ref={headlineRef}
+                className="text-center font-display text-[12vw] font-bold leading-[0.95] tracking-tight text-ink md:text-[8.5vw] lg:text-[7vw]"
               >
-                INTO INTELLIGENCE
-              </motion.span>
-            </h1>
+                <span className="block">TURNING DATA</span>
+                <span className="block">INTO INTELLIGENCE</span>
+              </h1>
+            </div>
 
-            <motion.p
-              variants={riseIn}
-              className="mt-4 text-right text-[0.9rem] font-light uppercase leading-snug tracking-[0.35em] text-ink/70 md:mt-6 md:text-base"
-            >
-              AI Engineer • Data Scientist
-            </motion.p>
+            <div className="mt-4 overflow-hidden md:mt-6">
+              <p
+                ref={rightLabelRef}
+                className="text-right text-[0.9rem] font-light uppercase leading-snug tracking-[0.35em] text-ink/70 md:text-base"
+              >
+                AI Engineer • Data Scientist
+              </p>
+            </div>
 
-            <motion.div variants={riseIn} className="mt-10 md:mt-12">
+            <div ref={menuRef} className="mt-10 md:mt-12">
               <MenuPill />
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
       </motion.div>
     </section>
