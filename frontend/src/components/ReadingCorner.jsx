@@ -1,4 +1,10 @@
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // Swap `url` for the real Medium links when published.
 const ARTICLES = [
@@ -131,8 +137,42 @@ const fadeUp = {
 };
 
 export default function ReadingCorner() {
+  const sectionRef = useRef(null);
+  const listRef = useRef(null);
+
+  useGSAP(
+    () => {
+      const articles = gsap.utils.toArray('.latest-read-item', listRef.current);
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        gsap.set(articles, { opacity: 1, y: 0 });
+        return;
+      }
+
+      gsap.fromTo(
+        articles,
+        { opacity: 0, y: 18 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.44,
+          ease: 'power2.out',
+          stagger: 0.07,
+          scrollTrigger: {
+            trigger: listRef.current,
+            start: 'top 80%',
+            once: true,
+          },
+          onComplete: () => gsap.set(articles, { clearProps: 'transform,opacity' }),
+        },
+      );
+    },
+    { scope: sectionRef },
+  );
+
   return (
-    <section id="reading" className="grain relative overflow-hidden bg-black text-cream">
+    <section ref={sectionRef} id="reading" className="grain relative overflow-hidden bg-black text-cream">
       {/* The Toolbox → Reading Corner seam is drawn by <ScrollMorphEdge> in
           Home.jsx (a velocity-reactive morphing curve), so there is no static
           edge here. Top padding below leaves room for that overlay. */}
@@ -163,16 +203,12 @@ export default function ReadingCorner() {
           </p>
         </motion.header>
 
-        <motion.div
-          className="mx-auto max-w-4xl"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-60px' }}
-        >
-          <div className="flex flex-wrap items-end justify-center gap-x-14 gap-y-16 md:gap-x-24">
+        <div className="mx-auto max-w-4xl">
+          <div ref={listRef} className="flex flex-wrap items-end justify-center gap-x-14 gap-y-16 md:gap-x-24">
             {ARTICLES.map((a, i) => (
-              <ArticleBook key={a.title} article={a} index={i} />
+              <div key={a.title} className="latest-read-item">
+                <ArticleBook article={a} index={i} />
+              </div>
             ))}
           </div>
 
@@ -181,7 +217,7 @@ export default function ReadingCorner() {
             <div className="h-2.5 rounded-[3px] border-t border-white/20 bg-gradient-to-b from-[#8B6F55] to-[#5E4936]" />
             <div className="absolute inset-x-10 top-full h-5 bg-black/80 blur-lg" />
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

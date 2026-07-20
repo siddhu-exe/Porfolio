@@ -36,20 +36,21 @@ export default function BookmarkProgress({ visible }) {
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <div className="absolute bottom-0 right-0 top-0 w-1 bg-cream/35 ring-1 ring-ink/10">
+      <div className="absolute bottom-0 right-0 top-0 w-[3px] overflow-hidden rounded-full bg-ink/10 shadow-[inset_0_0_1px_rgba(0,0,0,0.15)] backdrop-blur-sm">
         <div
           ref={fillRef}
-          className="absolute inset-x-0 top-0 h-full origin-top scale-y-0 bg-mustard will-change-transform"
+          className="absolute inset-x-0 top-0 h-full origin-top scale-y-0 rounded-full bg-gradient-to-b from-mustard via-mustard to-terracotta shadow-[0_0_10px_1px_rgba(255,232,98,0.55)] will-change-transform"
         />
       </div>
 
       <div
         ref={tabRef}
-        className="pointer-events-auto absolute right-[-5px] top-0 h-5 w-3.5 -translate-y-1 will-change-transform"
+        className="pointer-events-auto absolute right-[-6px] top-0 h-6 w-4 -translate-y-1 will-change-transform"
       >
-        <span className="absolute inset-0 bg-mustard [clip-path:polygon(0_0,100%_0,100%_100%,50%_72%,0_100%)]" />
-        <span className="absolute right-5 top-1/2 hidden -translate-y-1/2 whitespace-nowrap bg-ink px-2 py-1 text-[10px] uppercase text-cream opacity-0 transition-opacity duration-200 group-hover:opacity-100 md:block">
-          Page {page} of {TOTAL_PAGES}
+        <span className="absolute inset-0 bg-gradient-to-b from-mustard to-terracotta shadow-[0_2px_8px_rgba(217,131,74,0.4)] ring-1 ring-cream/40 [clip-path:polygon(0_0,100%_0,100%_100%,50%_68%,0_100%)]" />
+        <span className="absolute right-6 top-1/2 hidden -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-ink/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-cream opacity-0 shadow-lg ring-1 ring-cream/10 backdrop-blur-md transition-all duration-200 group-hover:opacity-100 md:flex">
+          <span className="text-mustard">{page}</span>
+          <span className="text-cream/50">/ {TOTAL_PAGES}</span>
         </span>
       </div>
     </aside>

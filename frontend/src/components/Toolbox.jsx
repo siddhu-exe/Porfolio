@@ -1,5 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // name -> simpleicons slug (rendered in original brand colors via CDN).
 // null slug falls back to an initials tile (e.g. XGBoost has no brand icon).
@@ -61,7 +66,7 @@ function HangingTool({ name, slug, stringLen, accent }) {
     });
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="toolbox-card flex flex-col items-center">
       {/* connector dot — cream at low opacity */}
       <div className="relative z-10 h-[7px] w-[7px] rounded-full bg-[#F0E6D2]/60 shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
 
@@ -113,9 +118,42 @@ function Screw({ className }) {
 export default function Toolbox() {
   // Stagger cord lengths per column so the rack looks hand-hung, not gridded.
   const stringLens = [10, 18, 13, 21, 15];
+  const sectionRef = useRef(null);
+  const gridRef = useRef(null);
+
+  useGSAP(
+    () => {
+      const cards = gsap.utils.toArray('.toolbox-card', gridRef.current);
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        gsap.set(cards, { opacity: 1, y: 0 });
+        return;
+      }
+
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 26 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.46,
+          ease: 'power2.out',
+          stagger: { each: 0.055, grid: 'auto', from: 'start' },
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top 80%',
+            once: true,
+          },
+          onComplete: () => gsap.set(cards, { clearProps: 'transform,opacity' }),
+        },
+      );
+    },
+    { scope: sectionRef },
+  );
 
   return (
-    <section id="toolbox" className="grain relative flex h-screen flex-col overflow-hidden bg-[#1A1410] text-[#F0E6D2]">
+    <section ref={sectionRef} id="toolbox" className="grain relative flex h-screen flex-col overflow-hidden bg-[#1A1410] text-[#F0E6D2]">
       {/* transition in: the cream shelf tears down into the espresso */}
       <svg
         viewBox="0 0 1440 70"
@@ -159,12 +197,8 @@ export default function Toolbox() {
         </motion.header>
 
         {/* walnut rack panel */}
-        <motion.div
+        <div
           className="relative mx-auto w-full max-w-4xl shrink-0 rounded-2xl bg-[#241C16] px-4 py-5 ring-1 ring-[#F0E6D2]/20 shadow-[0_30px_60px_rgba(0,0,0,0.6)] md:px-10 md:py-7"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-40px' }}
         >
           {/* faint wood grain */}
           <div
@@ -178,7 +212,7 @@ export default function Toolbox() {
           <Screw className="bottom-3 left-3" />
           <Screw className="bottom-3 right-3" />
 
-          <div className="relative grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-5 md:gap-x-5 md:gap-y-6">
+          <div ref={gridRef} className="relative grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-5 md:gap-x-5 md:gap-y-6">
             {TOOLS.map((t, i) => (
               <HangingTool
                 key={t.name}
@@ -189,7 +223,7 @@ export default function Toolbox() {
               />
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
