@@ -7,6 +7,7 @@ import Signature from './Signature.jsx';
 import MenuPill from './MenuPill.jsx';
 import CursorBadge from './CursorBadge.jsx';
 import CyclingTypewriter from './CyclingTypewriter.jsx';
+import CursorProximityText from './CursorProximityText.jsx';
 
 const CURSOR_PHRASES = ['hey there?', 'Curious?', 'Explore My Library ↓'];
 
@@ -25,11 +26,13 @@ gsap.registerPlugin(useGSAP, SplitText);
 export default function Hero({ sinkStyle, onIntroComplete }) {
   const [phase, setPhase] = useState('intro');
   const [cursorOn, setCursorOn] = useState(false);
+  const [cursorSequenceComplete, setCursorSequenceComplete] = useState(false);
   const heroTextRef = useRef(null);
   const leftLabelRef = useRef(null);
   const headlineRef = useRef(null);
   const rightLabelRef = useRef(null);
   const menuRef = useRef(null);
+  const proximityRef = useRef(null);
   const introCompleteRef = useRef(false);
 
   useEffect(() => {
@@ -66,6 +69,7 @@ export default function Hero({ sinkStyle, onIntroComplete }) {
       const timeline = gsap.timeline({
         defaults: { ease: 'power3.out' },
         onComplete: () => {
+          proximityRef.current?.activate(headlineSplit.chars);
           if (!introCompleteRef.current) {
             introCompleteRef.current = true;
             onIntroComplete?.();
@@ -87,6 +91,7 @@ export default function Hero({ sinkStyle, onIntroComplete }) {
         .to(menuRef.current, { y: 0, opacity: 1, duration: 0.28 }, 0.82);
 
       return () => {
+        proximityRef.current?.deactivate();
         timeline.kill();
         splits.forEach((split) => split.revert());
       };
@@ -103,11 +108,15 @@ export default function Hero({ sinkStyle, onIntroComplete }) {
       {/* Cursor badge runs from the moment the signature starts drawing,
           cycling through its phrases as the mouse moves over the hero. */}
       <CursorBadge
-        active={cursorOn}
+        active={cursorOn && !cursorSequenceComplete}
         centered={false}
         className="h-14 whitespace-nowrap bg-[#37ACE8] px-5 text-base text-white"
       >
-        <CyclingTypewriter phrases={CURSOR_PHRASES} />
+        <CyclingTypewriter
+          phrases={CURSOR_PHRASES}
+          run={cursorOn}
+          onComplete={() => setCursorSequenceComplete(true)}
+        />
       </CursorBadge>
 
       <motion.div className="absolute inset-0" style={sinkStyle}>
@@ -180,6 +189,8 @@ export default function Hero({ sinkStyle, onIntroComplete }) {
             <div ref={menuRef} className="mt-14 md:mt-16">
               <MenuPill />
             </div>
+
+            <CursorProximityText ref={proximityRef} />
           </div>
         )}
       </motion.div>
