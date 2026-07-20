@@ -119,6 +119,14 @@ body {
   background-size: 24px 24px;
 }
 
+/* GSAP owns the outer SplitText character; Framer Motion owns this inner
+   transform layer for the post-intro cursor-proximity interaction. */
+.proximity-char-inner {
+  display: inline-block;
+  transform-origin: 50% 70%;
+  will-change: transform;
+}
+
 /* Film-grain overlay for the dark sections — SVG turbulence noise tiled at
    very low opacity so flat blacks gain atmosphere without banding. Sits above
    the section's content (like real film grain) but never blocks interaction. */
